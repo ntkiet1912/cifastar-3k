@@ -8,16 +8,7 @@ public class TheatermgntApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TheatermgntApplication.class, args);
-
-        // test feature branch
-
-        // test feature branch 2
-
-        // test feature branch 3
-
-        // COMMIT 1
-        // COMMIT 2
-        // COMMIT 3
+        System.out.println("Cinema Management API is running on https://localhost:8080");
 
 	}
 
