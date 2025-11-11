@@ -4,6 +4,9 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { RouteGuard } from "@/components/route-guard";
+import { ProtectedRouteNotification } from "@/components/protected-route-notification";
+import { StoreInitializer } from "@/components/store-initializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,12 +31,18 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <Header />
-            {children}
-          <Footer/>
+          <StoreInitializer>
+            <RouteGuard>
+              <Header />
+              <ProtectedRouteNotification />
+              {children}
+              <Footer />
+            </RouteGuard>
+          </StoreInitializer>
         </ThemeProvider>
       </body>
     </html>

@@ -23,6 +23,13 @@ public enum ErrorCode {
     PHONE_NUMBER_REQUIRED(1015, "Phone number is required", HttpStatus.BAD_REQUEST),
     INVALID_PHONE_NUMBER_FORMAT(1016, "Invalid phone number format", HttpStatus.BAD_REQUEST),
     EMAIL_EXISTED(1017, "Email has existed", HttpStatus.BAD_REQUEST),
+    OTP_EXPIRED(1018, "OTP has expired", HttpStatus.BAD_REQUEST),
+    INVALID_OTP(1019, "Invalid OTP", HttpStatus.BAD_REQUEST),
+    FAILED_TO_REGISTER_USER(1020, "Failed to register customer by Google", HttpStatus.BAD_REQUEST),
+    PASSWORD_EXISTED(1021, "Password has existed", HttpStatus.BAD_REQUEST),
+    ACCOUNT_NOT_FOUND(1022, "Account not found", HttpStatus.NOT_FOUND),
+    PASSWORDS_DO_NOT_MATCH(1023, "Password and Confirm password do not match", HttpStatus.BAD_REQUEST),
+    CONFIRM_PASSWORD_REQUIRED(1024, "Confirm password is required", HttpStatus.BAD_REQUEST),
     //----
     CINEMA_EXISTED(2001, "Cinema existed", HttpStatus.BAD_REQUEST),
     CINEMA_NOT_EXISTED(2002, "Cinema not existed", HttpStatus.BAD_REQUEST),
@@ -38,6 +45,9 @@ public enum ErrorCode {
     COMBO_NOT_EXISTED(2012, "Seat not existed", HttpStatus.BAD_REQUEST),
     COMBO_ITEM_EXISTED(2011, "Seat existed", HttpStatus.BAD_REQUEST),
     COMBO_ITEM_NOT_EXISTED(2012, "Seat not existed", HttpStatus.BAD_REQUEST),
+
+    //----
+    CANNOT_SEND_EMAIL(3001, "Cannot send email", HttpStatus.BAD_REQUEST),
     ;
     private int code;
     private String message;

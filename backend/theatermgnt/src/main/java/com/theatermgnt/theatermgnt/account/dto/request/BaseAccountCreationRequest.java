@@ -24,7 +24,6 @@ public abstract class BaseAccountCreationRequest {
     @Email(message = "INVALID_EMAIL")
     String email;
 
-    @NotBlank(message = "PHONE_NUMBER_REQUIRED")
     @Pattern(regexp = "^0[0-9]{9}$", message = "INVALID_PHONE_NUMBER_FORMAT")
     String phoneNumber;
 

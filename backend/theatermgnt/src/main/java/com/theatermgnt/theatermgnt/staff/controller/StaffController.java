@@ -4,7 +4,7 @@ import com.theatermgnt.theatermgnt.common.dto.response.ApiResponse;
 import com.theatermgnt.theatermgnt.staff.dto.request.StaffAccountCreationRequest;
 import com.theatermgnt.theatermgnt.staff.dto.request.StaffProfileUpdateRequest;
 import com.theatermgnt.theatermgnt.staff.dto.response.StaffResponse;
-import com.theatermgnt.theatermgnt.authentication.service.RegistrationService;
+import com.theatermgnt.theatermgnt.account.service.RegistrationService;
 import com.theatermgnt.theatermgnt.staff.service.StaffService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;

@@ -1,13 +1,15 @@
-
-import { ThemeProvider } from "@/providers/ThemeProvider"
-import AllRoute from "./components/AllRoute"
+import AllRoute from "./components/AllRoute";
+import { NotificationContainer } from "./components/ui/notification";
+import { LoadingOverlay } from "./components/ui/loading";
 
 function App() {
   return (
-    <ThemeProvider>
-      <AllRoute/>
-    </ThemeProvider>
-  )
+    <>
+      <AllRoute />
+      <NotificationContainer />
+      <LoadingOverlay />
+    </>
+  );
 }
 
-export default App
+export default App;

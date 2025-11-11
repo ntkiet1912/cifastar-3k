@@ -1,12 +1,10 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { isAuthenticated } from "@/services/authenticationService";
+import { useAuthStore, selectIsAuthenticated } from "@/stores";
 
-function PrivateRoute(){
-  const isLogin = isAuthenticated();
-  return(
-    <>
-      {isLogin ? (<Outlet />) : (<Navigate to="/login"/> )}
-    </>
-  )
+function PrivateRoute() {
+  const isAuthenticated = useAuthStore(selectIsAuthenticated);
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
 }
+
 export default PrivateRoute;

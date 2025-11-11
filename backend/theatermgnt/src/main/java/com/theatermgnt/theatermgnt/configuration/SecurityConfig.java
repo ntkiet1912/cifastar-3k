@@ -24,6 +24,7 @@ public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
             "/register",
             "/users", "/auth/token", "/auth/introspect", "/auth/logout", "/auth/refresh",
+            "/notifications/email/send", "/auth/forgot-password", "/auth/reset-password", "/auth/outbound/authenticate",
     };
 
     @Autowired
@@ -53,6 +54,7 @@ public class SecurityConfig {
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.addAllowedOrigin("http://localhost:5173");
+        corsConfiguration.addAllowedOrigin("http://localhost:3000");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.setAllowCredentials(true);

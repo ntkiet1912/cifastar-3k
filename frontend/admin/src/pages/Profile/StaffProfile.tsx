@@ -1,28 +1,36 @@
-import { useState, useEffect } from "react"
-import { Mail, Phone, MapPin, Calendar, User, Briefcase, Building2 } from "lucide-react"
-import { ImageUploader } from "@/components/fileStorage/ImageUploader"
-import { Modal } from "@/components/ui/Modal"
-import { Toast } from "@/components/ui/Toast"
-import { InfoCard, InfoCardItem } from "@/components/ui/InfoCard"
-import { FormField } from "@/components/form/FormField"
-import { SelectField } from "@/components/form/SelectField"
-import { ActionButtons } from "@/components/form/ActionButtons"
-import { ProfileHeader } from "@/components/profile/ProfileHeader"
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner"
-import { PageHeader } from "@/components/ui/PageHeader"
-import { useToast } from "@/hooks/useToast"
-import { getMyInfo, updateMyInfo} from "@/services/staffService"
-import type { StaffProfile } from "@/types/StaffType/StaffProfile"
-
+import { useState, useEffect } from "react";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  User,
+  Briefcase,
+  Building2,
+} from "lucide-react";
+import { ImageUploader } from "@/components/fileStorage/ImageUploader";
+import { Modal } from "@/components/ui/Modal";
+import { InfoCard, InfoCardItem } from "@/components/ui/InfoCard";
+import { FormField } from "@/components/form/FormField";
+import { SelectField } from "@/components/form/SelectField";
+import { ActionButtons } from "@/components/form/ActionButtons";
+import { ProfileHeader } from "@/components/profile/ProfileHeader";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { useNotificationStore } from "@/stores";
+import { getMyInfo, updateMyInfo } from "@/services/staffService";
+import type { StaffProfile } from "@/types/StaffType/StaffProfile";
 
 export function Profile() {
-  const [isEditing, setIsEditing] = useState(false)
-  const [showImageUploader, setShowImageUploader] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const [profile, setProfile] = useState<StaffProfile | null>(null)
-  const { toast, success, error: showError, hideToast } = useToast()
-  
+  const [isEditing, setIsEditing] = useState(false);
+  const [showImageUploader, setShowImageUploader] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [profile, setProfile] = useState<StaffProfile | null>(null);
+  const addNotification = useNotificationStore(
+    (state) => state.addNotification
+  );
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -31,23 +39,23 @@ export function Profile() {
     address: "",
     dob: "",
     gender: "MALE" as "MALE" | "FEMALE" | "OTHER",
-    avatarUrl: ""
-  })
+    avatarUrl: "",
+  });
 
   // Fetch profile data on component mount
   useEffect(() => {
-    fetchProfile()
-  }, [])
+    fetchProfile();
+  }, []);
 
   const fetchProfile = async () => {
     try {
-      setIsLoading(true)
-      const response = await getMyInfo()
-      
+      setIsLoading(true);
+      const response = await getMyInfo();
+
       if (response.data.code === 1000) {
-        const data = response.data.result
-        setProfile(data)
-        
+        const data = response.data.result;
+        setProfile(data);
+
         // Update form data
         setFormData({
           firstName: data.firstName || "",
@@ -57,104 +65,131 @@ export function Profile() {
           address: data.address || "",
           dob: data.dob || "",
           gender: data.gender || "MALE",
-          avatarUrl: data.avatarUrl || ""
-        })
+          avatarUrl: data.avatarUrl || "",
+        });
       }
     } catch (error) {
-      console.error("Error fetching profile:", error)
-      showError("Cannot load profile information. Please try again.")
+      console.error("Error fetching profile:", error);
+      addNotification({
+        type: "error",
+        title: "Error",
+        message: "Cannot load profile information. Please try again.",
+        duration: 5000,
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
-    }))
-  }
+      [name]: value,
+    }));
+  };
 
   const handleAvatarClick = () => {
-    setShowImageUploader(true)
-  }
+    setShowImageUploader(true);
+  };
 
   const handleUploadSuccess = (url: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      avatarUrl: url
-    }))
-    setShowImageUploader(false)
-    success("Avatar uploaded successfully!")
-    console.log('Avatar uploaded successfully:', url)
-  }
+      avatarUrl: url,
+    }));
+    setShowImageUploader(false);
+    addNotification({
+      type: "success",
+      title: "Success",
+      message: "Avatar uploaded successfully!",
+      duration: 3000,
+    });
+    console.log("Avatar uploaded successfully:", url);
+  };
 
   // Save profile changes
   const handleSave = async () => {
     if (!profile?.staffId) {
-      showError("Not found staff information!")
-      return
+      addNotification({
+        type: "error",
+        title: "Error",
+        message: "Not found staff information!",
+        duration: 5000,
+      });
+      return;
     }
 
     try {
-      setIsSaving(true)
-      
+      setIsSaving(true);
+
       const updateData = {
         firstName: formData.firstName,
         lastName: formData.lastName,
         address: formData.address,
         gender: formData.gender,
         dob: formData.dob,
-        avatarUrl: formData.avatarUrl || undefined
-      }
-      
-      const response = await updateMyInfo(profile.staffId, updateData)
-      
+        avatarUrl: formData.avatarUrl || undefined,
+      };
+
+      const response = await updateMyInfo(profile.staffId, updateData);
+
       if (response.data.code === 1000) {
-        success("Profile updated successfully!")
-        setIsEditing(false)
+        addNotification({
+          type: "success",
+          title: "Success",
+          message: "Profile updated successfully!",
+          duration: 3000,
+        });
+        setIsEditing(false);
         // Refresh profile data
-        await fetchProfile()
+        await fetchProfile();
       }
     } catch (err) {
-      console.error("Error updating profile:", err)
-      showError("Failed to update profile. Please try again.")
+      console.error("Error updating profile:", err);
+      addNotification({
+        type: "error",
+        title: "Error",
+        message: "Failed to update profile. Please try again.",
+        duration: 5000,
+      });
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const getFullName = () => {
-    return `${formData.firstName} ${formData.lastName}`.trim() || "User"
-  }
+    return `${formData.firstName} ${formData.lastName}`.trim() || "User";
+  };
 
   const getRoleName = () => {
-    if (!profile?.roles || profile.roles.length === 0) return "No Role"
-    return profile.roles.map(r => r.name).join(", ")
-  }
+    if (!profile?.roles || profile.roles.length === 0) return "No Role";
+    return profile.roles.map((r) => r.name).join(", ");
+  };
 
   const genderOptions = [
     { value: "MALE", label: "Male" },
     { value: "FEMALE", label: "Female" },
-    { value: "OTHER", label: "Other" }
-  ]
+    { value: "OTHER", label: "Other" },
+  ];
 
   const getGenderDisplay = () => {
-    const option = genderOptions.find(opt => opt.value === formData.gender)
-    return option?.label || formData.gender
-  }
+    const option = genderOptions.find((opt) => opt.value === formData.gender);
+    return option?.label || formData.gender;
+  };
 
   if (isLoading) {
-    return <LoadingSpinner message="Loading..." />
+    return <LoadingSpinner message="Loading..." />;
   }
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto space-y-6">
-        <PageHeader 
-          title="Profile Settings" 
-          description="Manage your personal information" 
+        <PageHeader
+          title="Profile Settings"
+          description="Manage your personal information"
         />
 
         <ProfileHeader
@@ -288,12 +323,13 @@ export function Profile() {
         <InfoCard title="Account Information">
           <InfoCardItem
             label="Account Type"
-            value={profile?.accountType === "INTERNAL" ? "Internal" : profile?.accountType || "N/A"}
+            value={
+              profile?.accountType === "INTERNAL"
+                ? "Internal"
+                : profile?.accountType || "N/A"
+            }
           />
-          <InfoCardItem
-            label="Staff ID"
-            value={profile?.staffId || "N/A"}
-          />
+          <InfoCardItem label="Staff ID" value={profile?.staffId || "N/A"} />
           <InfoCardItem
             label="Account ID"
             value={profile?.accountId || "N/A"}
@@ -301,7 +337,9 @@ export function Profile() {
           />
           <InfoCardItem
             label="Permissions"
-            value={`${profile?.roles?.[0]?.permissions?.length || 0} permissions`}
+            value={`${
+              profile?.roles?.[0]?.permissions?.length || 0
+            } permissions`}
           />
         </InfoCard>
 
@@ -312,15 +350,7 @@ export function Profile() {
         >
           <ImageUploader onUploadSuccess={handleUploadSuccess} />
         </Modal>
-
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          isVisible={toast.isVisible}
-          onClose={hideToast}
-          duration={3000}
-        />
       </div>
     </div>
-  )
+  );
 }

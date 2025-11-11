@@ -35,7 +35,6 @@ public class Account {
     String password;
 
     @Column(unique = true)
-
     String phoneNumber;
 
     @Enumerated(EnumType.STRING)

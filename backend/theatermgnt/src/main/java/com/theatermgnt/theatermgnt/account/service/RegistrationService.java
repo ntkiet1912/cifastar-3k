@@ -1,7 +1,9 @@
-package com.theatermgnt.theatermgnt.authentication.service;
+package com.theatermgnt.theatermgnt.account.service;
 
-import com.theatermgnt.theatermgnt.account.service.AccountService;
+import com.theatermgnt.theatermgnt.account.repository.AccountRepository;
+import com.theatermgnt.theatermgnt.authentication.dto.request.OAuthCustomerCreationRequest;
 import com.theatermgnt.theatermgnt.constant.PredefinedRole;
+import com.theatermgnt.theatermgnt.customer.repository.CustomerRepository;
 import com.theatermgnt.theatermgnt.customer.service.CustomerService;
 import com.theatermgnt.theatermgnt.staff.dto.request.StaffAccountCreationRequest;
 import com.theatermgnt.theatermgnt.customer.dto.response.CustomerResponse;
@@ -40,6 +42,8 @@ public class RegistrationService {
     CustomerMapper customerMapper;
     StaffMapper staffMapper;
     RoleRepository roleRepository;
+    AccountRepository accountRepository;
+    CustomerRepository customerRepository;
 
     @Transactional
     public CustomerResponse registerCustomerAccount(CustomerAccountCreationRequest request) {
@@ -50,6 +54,27 @@ public class RegistrationService {
         return customerMapper.toCustomerResponse(savedCustomer);
     }
 
+    @Transactional
+    public Account registerOAuthCustomer (OAuthCustomerCreationRequest request) {
+        return accountRepository.findByEmail(request.getEmail()).orElseGet(() -> {;
+            Account newAccount = Account.builder()
+                    .email(request.getEmail())
+                    .username(request.getEmail())
+                    .accountType(AccountType.CUSTOMER)
+                    .isActive(true)
+                    .build();
+            Account savedAccount = accountRepository.save(newAccount);
+
+            Customer newCustomer = Customer.builder()
+                    .firstName(request.getFirstName())
+                    .lastName(request.getLastName())
+                    .account(savedAccount)
+                    .build();
+            customerRepository.save(newCustomer);
+            return savedAccount;
+        });
+
+    }
 
     /// Create staff account
     @PreAuthorize("hasRole('ADMIN')")

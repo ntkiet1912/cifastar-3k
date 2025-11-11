@@ -1,25 +1,79 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Menu, X, Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import { Menu, X, Moon, Sun, User } from "lucide-react";
+import { useTheme } from "next-themes";
+import { AuthModal } from "./auth-modal";
+import { clearAuthData } from "@/services/localStorageService";
+import { useRouter, usePathname } from "next/navigation";
+import { useAuthStore, useAuthModalStore } from "@/store";
 
 export function Header() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [showAuthModal, setShowAuthModal] = useState<"login" | "register" | null>(null)
-  const { theme, setTheme, resolvedTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Zustand stores
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const logout = useAuthStore((state) => state.logout);
+  const showAuthModal = useAuthModalStore((state) => state.showAuthModal);
+  const setShowAuthModal = useAuthModalStore((state) => state.setShowAuthModal);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (mounted) {
-      console.log("[v0] Theme changed to:", resolvedTheme)
+      console.log("[v0] Theme changed to:", resolvedTheme);
     }
-  }, [resolvedTheme, mounted])
+  }, [resolvedTheme, mounted]);
+
+  // Handle scroll to section when navigating with hash
+  useEffect(() => {
+    if (pathname === "/" && window.location.hash) {
+      // Wait for the page to render
+      setTimeout(() => {
+        const hash = window.location.hash;
+        const element = document.querySelector(hash);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 100);
+    }
+  }, [pathname]);
+
+  // Handle click outside to close user menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showUserMenu]);
+
+  const handleLogout = () => {
+    clearAuthData();
+    logout();
+    setShowUserMenu(false);
+    router.push("/");
+  };
 
   const navItems = [
     { label: "Now Showing", href: "#now-showing" },
@@ -27,13 +81,34 @@ export function Header() {
     { label: "Membership", href: "#membership" },
     { label: "Facilities", href: "#facilities" },
     { label: "Contact", href: "#contact" },
-  ]
+  ];
+
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    e.preventDefault();
+
+    // If not on home page, navigate to home first with the hash
+    if (pathname !== "/") {
+      router.push(`/${href}`);
+    } else {
+      // Already on home page, just scroll to section
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+
+    // Close mobile menu if open
+    setIsOpen(false);
+  };
 
   const handleThemeToggle = () => {
-    const newTheme = resolvedTheme === "dark" ? "light" : "dark"
-    console.log("[v0] Toggling theme to:", newTheme)
-    setTheme(newTheme)
-  }
+    const newTheme = resolvedTheme === "dark" ? "light" : "dark";
+    console.log("[v0] Toggling theme to:", newTheme);
+    setTheme(newTheme);
+  };
 
   return (
     <>
@@ -44,7 +119,9 @@ export function Header() {
             <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-lg">C</span>
             </div>
-            <span className="gradient-text font-bold text-xl hidden sm:inline">CINEPLEX</span>
+            <span className="gradient-text font-bold text-xl hidden sm:inline">
+              CINEPLEX
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -53,7 +130,8 @@ export function Header() {
               <a
                 key={item.href}
                 href={item.href}
-                className="text-muted-foreground hover:text-foreground transition-colors text-sm font-medium"
+                onClick={(e) => handleNavClick(e, item.href)}
+                className="text-muted-foreground hover:text-foreground transition-colors text-sm font-medium cursor-pointer"
               >
                 {item.label}
               </a>
@@ -67,24 +145,70 @@ export function Header() {
                 onClick={handleThemeToggle}
                 className="p-2 rounded-lg hover:bg-muted transition-colors"
                 aria-label="Toggle theme"
-                title={`Switch to ${resolvedTheme === "dark" ? "light" : "dark"} mode`}
+                title={`Switch to ${
+                  resolvedTheme === "dark" ? "light" : "dark"
+                } mode`}
               >
-                {resolvedTheme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+                {resolvedTheme === "dark" ? (
+                  <Sun size={20} />
+                ) : (
+                  <Moon size={20} />
+                )}
               </button>
             )}
 
-            <button
-              onClick={() => setShowAuthModal("login")}
-              className="px-4 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm font-medium"
-            >
-              Login
-            </button>
-            <button
-              onClick={() => setShowAuthModal("register")}
-              className="px-6 py-2 rounded-lg gradient-primary text-white font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all text-sm"
-            >
-              Sign Up
-            </button>
+            {isAuthenticated ? (
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm font-medium"
+                >
+                  <User size={18} />
+                  <span>Profile</span>
+                </button>
+
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-card border border-border rounded-lg shadow-lg py-2 z-50">
+                    <Link
+                      href="/profile"
+                      className="block px-4 py-2 text-sm hover:bg-muted transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      My Profile
+                    </Link>
+                    <Link
+                      href="/my-tickets"
+                      className="block px-4 py-2 text-sm hover:bg-muted transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      My Tickets
+                    </Link>
+                    <hr className="my-2 border-border" />
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-muted transition-colors"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={() => setShowAuthModal("login")}
+                  className="px-4 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm font-medium"
+                >
+                  Login
+                </button>
+                <button
+                  onClick={() => setShowAuthModal("register")}
+                  className="px-6 py-2 rounded-lg gradient-primary text-white font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all text-sm"
+                >
+                  Sign Up
+                </button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -105,8 +229,8 @@ export function Header() {
                 <a
                   key={item.href}
                   href={item.href}
-                  className="text-muted-foreground hover:text-foreground transition-colors font-medium"
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => handleNavClick(e, item.href)}
+                  className="text-muted-foreground hover:text-foreground transition-colors font-medium cursor-pointer"
                 >
                   {item.label}
                 </a>
@@ -118,7 +242,11 @@ export function Header() {
                     className="flex-1 px-4 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm font-medium flex items-center justify-center gap-2"
                     aria-label="Toggle theme"
                   >
-                    {resolvedTheme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+                    {resolvedTheme === "dark" ? (
+                      <Sun size={18} />
+                    ) : (
+                      <Moon size={18} />
+                    )}
                     {resolvedTheme === "dark" ? "Light" : "Dark"}
                   </button>
                 )}
@@ -141,67 +269,14 @@ export function Header() {
       </header>
 
       {showAuthModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-card border border-border rounded-2xl p-8 max-w-md w-full">
-            <button
-              onClick={() => setShowAuthModal(null)}
-              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
-            >
-              <X size={24} />
-            </button>
-
-            <h2 className="text-2xl font-bold mb-6">{showAuthModal === "login" ? "Login" : "Create Account"}</h2>
-
-            <form className="space-y-4">
-              {showAuthModal === "register" && (
-                <div>
-                  <label className="block text-sm font-medium mb-2">Full Name</label>
-                  <input
-                    type="text"
-                    placeholder="Your name"
-                    className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:outline-none focus:border-purple-500 transition-colors"
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Email</label>
-                <input
-                  type="email"
-                  placeholder="your@email.com"
-                  className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:outline-none focus:border-purple-500 transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Password</label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:outline-none focus:border-purple-500 transition-colors"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full px-6 py-3 rounded-lg gradient-primary text-white font-semibold hover:shadow-lg transition-all"
-              >
-                {showAuthModal === "login" ? "Login" : "Create Account"}
-              </button>
-            </form>
-
-            <p className="text-center text-sm text-muted-foreground mt-4">
-              {showAuthModal === "login" ? "Don't have an account? " : "Already have an account? "}
-              <button
-                onClick={() => setShowAuthModal(showAuthModal === "login" ? "register" : "login")}
-                className="text-purple-600 hover:text-purple-700 font-semibold"
-              >
-                {showAuthModal === "login" ? "Sign Up" : "Login"}
-              </button>
-            </p>
-          </div>
-        </div>
+        <AuthModal
+          mode={showAuthModal}
+          onClose={() => setShowAuthModal(null)}
+          onSwitchMode={() =>
+            setShowAuthModal(showAuthModal === "login" ? "register" : "login")
+          }
+        />
       )}
     </>
-  )
+  );
 }

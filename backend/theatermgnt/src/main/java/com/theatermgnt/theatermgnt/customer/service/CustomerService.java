@@ -18,6 +18,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -32,7 +33,6 @@ public class CustomerService {
     /// CREATE CUSTOMER PROFILE
     @Transactional
     public Customer createCustomerProfile(CustomerAccountCreationRequest request, Account account) {
-
         Customer customer = customerMapper.toCustomer(request);
         customer.setAccount(account);
         return customerRepository.save(customer);
@@ -52,7 +52,9 @@ public class CustomerService {
 
         Customer customer = customerRepository.findByAccountId(accountId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        return customerMapper.toCustomerResponse(customer);
+        var customerResponse = customerMapper.toCustomerResponse(customer);
+        customerResponse.setNoPassword(!StringUtils.hasText(customer.getAccount().getPassword()));
+        return customerResponse;
     }
 
     /// GET ALl CUSTOMERS

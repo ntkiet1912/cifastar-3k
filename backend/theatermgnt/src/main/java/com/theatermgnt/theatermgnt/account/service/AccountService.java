@@ -1,5 +1,9 @@
 package com.theatermgnt.theatermgnt.account.service;
 
+import com.theatermgnt.theatermgnt.account.dto.request.PasswordCreationRequest;
+import com.theatermgnt.theatermgnt.customer.entity.Customer;
+import com.theatermgnt.theatermgnt.customer.repository.CustomerRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -32,9 +37,9 @@ public class AccountService {
         if(accountRepository.existsByEmail(request.getEmail())) {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
-        if(accountRepository.existsByPhoneNumber(request.getPhoneNumber())) {
-            throw new AppException(ErrorCode.PHONE_NUMBER_EXISTED);
-        }
+//        if(accountRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+//            throw new AppException(ErrorCode.PHONE_NUMBER_EXISTED);
+//        }
         Account account = accountMapper.toAccount(request);
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         return accountRepository.save(account);
@@ -45,6 +50,24 @@ public class AccountService {
             throw new AppException(ErrorCode.PHONE_NUMBER_EXISTED);
         }
         accountMapper.updateAccount(account, request);
+        accountRepository.save(account);
+    }
+
+    public void createPassword(PasswordCreationRequest request) {
+
+        if(!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new AppException(ErrorCode.PASSWORDS_DO_NOT_MATCH);
+        }
+        var context = SecurityContextHolder.getContext();
+        String accountId = context.getAuthentication().getName();
+
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        if(StringUtils.hasText(account.getPassword())) {
+            throw new AppException(ErrorCode.PASSWORD_EXISTED);
+        }
+        account.setPassword(passwordEncoder.encode(request.getPassword()));
         accountRepository.save(account);
     }
 }

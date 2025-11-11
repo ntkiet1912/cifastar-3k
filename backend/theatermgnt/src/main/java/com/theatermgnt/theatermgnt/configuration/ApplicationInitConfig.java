@@ -2,7 +2,7 @@
 
  import com.theatermgnt.theatermgnt.staff.dto.request.StaffAccountCreationRequest;
  import com.theatermgnt.theatermgnt.account.repository.AccountRepository;
- import com.theatermgnt.theatermgnt.authentication.service.RegistrationService;
+ import com.theatermgnt.theatermgnt.account.service.RegistrationService;
  import lombok.AccessLevel;
  import lombok.RequiredArgsConstructor;
  import lombok.experimental.FieldDefaults;
