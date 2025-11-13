@@ -8,6 +8,7 @@ import {
   API
 } from "../configurations/configuration";
 import { useAuthStore } from "@/stores";
+import { getMyInfo } from "./staffService";
 
 export const login = async (loginIdentifier: string, password: string) => {
   const response = await httpClient.post(API.LOGIN, {
@@ -16,17 +17,41 @@ export const login = async (loginIdentifier: string, password: string) => {
   });
 
   const token = response.data?.result?.token;
-  const user = response.data?.result?.user;
 
   if (token) {
     setToken(token);
     
-    // Update Zustand store
-    useAuthStore.getState().setAuth(token, user || {
-      id: response.data?.result?.userId || '',
-      email: loginIdentifier,
-      username: loginIdentifier,
-    });
+    // Fetch user info with permissions after successful login
+    try {
+      const userInfoResponse = await getMyInfo();
+      const userInfo = userInfoResponse.data?.result;
+      
+      if (userInfo) {
+        // Update Zustand store with full user info including roles and permissions
+        useAuthStore.getState().setAuth(token, {
+          id: userInfo.accountId || '',
+          email: userInfo.email || loginIdentifier,
+          username: userInfo.username || loginIdentifier,
+          accountId: userInfo.accountId,
+          accountType: userInfo.accountType,
+          firstName: userInfo.firstName,
+          lastName: userInfo.lastName,
+          staffId: userInfo.staffId,
+          cinemaId: userInfo.cinemaId,
+          jobTitle: userInfo.jobTitle,
+          avatarUrl: userInfo.avatarUrl,
+          roles: userInfo.roles || [],
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch user info:', error);
+      // If fetching user info fails, still set basic auth
+      useAuthStore.getState().setAuth(token, {
+        id: response.data?.result?.userId || '',
+        email: loginIdentifier,
+        username: loginIdentifier,
+      });
+    }
   }
 
   return response;

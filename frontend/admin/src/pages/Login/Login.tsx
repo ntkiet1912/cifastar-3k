@@ -15,6 +15,7 @@ import {
   useNotificationStore,
   selectIsAuthenticated,
 } from "@/stores";
+import { ROUTES } from "@/constants/routes";
 
 export function Login() {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export function Login() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/");
+      navigate(ROUTES.DASHBOARD);
     }
   }, [isAuthenticated, navigate]);
 
@@ -50,7 +51,7 @@ export function Login() {
         duration: 3000,
       });
 
-      navigate("/");
+      navigate(ROUTES.DASHBOARD);
     } catch (error) {
       console.error("Login failed:", error);
       const errorMessage = "Invalid username or password";
