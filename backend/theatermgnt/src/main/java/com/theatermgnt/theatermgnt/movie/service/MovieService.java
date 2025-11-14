@@ -60,9 +60,45 @@ public class MovieService {
     // ========== READ ==========
 
     public List<MovieSimpleResponse> getAllMovies() {
-        return movieRepository.findAll().stream()
-                .map(movieMapper::toSimpleResponse)
-                .collect(Collectors.toList());
+        try {
+            System.out.println("🔍 [DEBUG] Starting getAllMovies...");
+
+            List<Movie> movies = movieRepository.findAllWithGenres();
+            System.out.println("✅ [DEBUG] Found " + movies.size() + " movies from DB");
+
+            // Debug từng movie
+            for (int i = 0; i < movies.size(); i++) {
+                Movie movie = movies.get(i);
+                System.out.println("\n📽️ [DEBUG] Movie #" + (i+1) + ":");
+                System.out.println("   - ID: " + movie.getId());
+                System.out.println("   - Title: " + movie.getTitle());
+                System.out.println("   - Status: " + movie.getStatus());
+                System.out.println("   - AgeRating: " + movie.getAgeRating());
+                System.out.println("   - AgeRating Code: " + (movie.getAgeRating() != null ? movie.getAgeRating().getCode() : "NULL"));
+                System.out.println("   - Genres: " + movie.getGenres());
+                System.out.println("   - Genres size: " + (movie.getGenres() != null ? movie.getGenres().size() : "NULL"));
+            }
+
+            System.out.println("\n🔄 [DEBUG] Starting mapping process...");
+            List<MovieSimpleResponse> responses = movies.stream()
+                    .map(movie -> {
+                        System.out.println("   Mapping: " + movie.getTitle());
+                        MovieSimpleResponse response = movieMapper.toSimpleResponse(movie);
+                        System.out.println("   ✓ Mapped successfully");
+                        return response;
+                    })
+                    .collect(Collectors.toList());
+
+            System.out.println("✅ [DEBUG] Successfully mapped to " + responses.size() + " responses");
+            return responses;
+
+        } catch (Exception e) {
+            System.err.println("❌ [ERROR] Exception in getAllMovies:");
+            System.err.println("   Message: " + e.getMessage());
+            System.err.println("   Class: " + e.getClass().getName());
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     public MovieResponse getMovieById(String id) {

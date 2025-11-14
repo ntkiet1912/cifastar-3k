@@ -8,11 +8,16 @@ spring:
   application:
       name: theater-mgnt
   datasource:
-    url: jdbc:postgresql://localhost:5432/theaterdb
+    url: jdbc:postgresql://localhost:5433/theaterdb
     username: postgres
     password: 123456
-    driver-class-name: org.postgresql.Driver
 
+#  datasource:
+#    url: jdbc:postgresql://db.zpjvpfkwbcnszfzdwynf.supabase.co:5432/postgres
+#    username: postgres
+#    password: 3kSE347@123
+
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update

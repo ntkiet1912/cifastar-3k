@@ -9,6 +9,7 @@ import com.theatermgnt.theatermgnt.authentication.dto.request.RefreshTokenReques
 import com.theatermgnt.theatermgnt.authentication.dto.response.AuthenticationResponse;
 import com.theatermgnt.theatermgnt.authentication.dto.response.IntrospectResponse;
 import com.theatermgnt.theatermgnt.authentication.service.AuthenticationService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

@@ -20,6 +20,9 @@ public interface MovieRepository extends JpaRepository<Movie, String> {
     @Query("SELECT m FROM Movie m WHERE m.status = 'coming_soon'")
     List<Movie> findComingSoonMovies();
 
+    @Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.genres LEFT JOIN FETCH m.ageRating")
+    List<Movie> findAllWithGenres();
+
     List<Movie> findByTitleContainingIgnoreCase(String title);
 
     @Query("SELECT m FROM Movie m JOIN m.genres g WHERE g.id = ?1")

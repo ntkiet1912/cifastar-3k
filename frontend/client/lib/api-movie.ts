@@ -1,140 +1,143 @@
 import axios from 'axios'
 
 // API base URL - Bao gồm context-path từ backend
-const API_URL = 'http://localhost:8080/api/theater-mgnt'
+const API_BASE_URL = 'http://localhost:8080/api/theater-mgnt'
 
 // Tạo axios instance
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// ==================== MOVIE APIs ====================
-
-/**
- * Lấy danh sách phim đang chiếu (NOW_SHOWING)
- */
-export const getNowShowingMovies = async () => {
-  try {
-    console.log('🎬 Fetching NOW_SHOWING movies...')
-
-    // Backend có endpoint riêng cho now-showing
-    const response = await api.get('/movies/now-showing')
-
-    console.log('✅ Response:', response.data)
-
-    // Backend trả về: { code, message, result: [...] }
-    return response.data.data || []
-
-  } catch (error) {
-    console.error('❌ Error fetching NOW_SHOWING movies:', error)
-
-    if (axios.isAxiosError(error)) {
-      console.error('Response data:', error.response?.data)
-      console.error('Response status:', error.response?.status)
-    }
-
-    return []
-  }
-}
-
-/**
- * Lấy danh sách phim sắp chiếu (COMING_SOON)
- */
-export const getComingSoonMovies = async () => {
-  try {
-    console.log('🎬 Fetching COMING_SOON movies...')
-
-    // Backend có endpoint riêng cho coming-soon
-    const response = await api.get('/movies/coming-soon')
-
-    console.log('✅ Response:', response.data)
-
-    return response.data.data || []
-
-  } catch (error) {
-    console.error('❌ Error fetching COMING_SOON movies:', error)
-
-    if (axios.isAxiosError(error)) {
-      console.error('Response data:', error.response?.data)
-      console.error('Response status:', error.response?.status)
-    }
-
-    return []
-  }
-}
-
-/**
- * Lấy chi tiết 1 phim theo ID
- */
-export const getMovieById = async (id: number | string) => {
-  try {
-    console.log(`🎬 Fetching movie details for ID: ${id}`)
-
-    const response = await api.get(`/movies/${id}`)
-
-    console.log('✅ Movie details:', response.data)
-
-    return response.data.result
-
-  } catch (error) {
-    console.error(`❌ Error fetching movie ${id}:`, error)
-
-    if (axios.isAxiosError(error)) {
-      if (error.response?.status === 404) {
-        console.error('Movie not found')
+api.interceptors.response.use(
+  (response) => {
+    // Nếu response có cấu trúc { success, message, data }
+    // Tự động trả về phần data bên trong
+    if (response.data && typeof response.data === 'object' && 'data' in response.data) {
+      return {
+        ...response,
+        data: response.data.data
       }
     }
-
-    return null
+    return response
+  },
+  (error) => {
+    return Promise.reject(error)
   }
-}
+)
 
-/**
- * Lấy danh sách tất cả genres (nếu có endpoint)
- */
-export const getAllGenres = async () => {
+// ==================== MOVIE APIs ====================
+export async function getMovieById(id: string) {
   try {
-    console.log('🎭 Fetching genres...')
+    console.log('🔍 API Call: GET', `${API_BASE_URL}/movies/${id}`)
 
-    const response = await api.get('/genres')
+    // ✅ FIX: Sửa syntax từ api.get`...` thành api.get(...)
+    const response = await api.get(`/movies/${id}`)
 
-    console.log('✅ Genres:', response.data)
+    console.log('✅ API Response (unwrapped):', response.data)
 
-    return response.data.result || []
+    if (!response.data) {
+      console.error('❌ Response data is null or undefined')
+      return null
+    }
 
-  } catch (error) {
-    console.error('❌ Error fetching genres:', error)
-    return []
+    return response.data
+  } catch (error: any) {
+    console.error('❌ API Error:', {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      url: error.config?.url,
+      fullError: error
+    })
+
+    if (error.response?.status === 404) {
+      return null
+    }
+
+    throw error
   }
 }
 
-// ==================== HELPER FUNCTIONS ====================
-
-/**
- * Convert backend movie format to frontend display format
- * Backend MovieSimpleResponse: { id, title, posterUrl, durationMinutes, releaseDate, ageRatingName, genreNames, status }
- * Backend MovieResponse: có thêm description, director, cast, trailerUrl...
- */
-export const mapMovieForDisplay = (movie: any) => {
-  if (!movie) return null
-
-  return {
-    id: movie.id || '',
-    title: movie.title || '',
-    genre: movie.genreNames || [], // Backend trả về genreNames (array)
-    rating: movie.ageRatingName || 'NR', // Backend trả về ageRatingName (string)
-    duration: movie.durationMinutes || 0, // Backend dùng durationMinutes
-    releaseDate: movie.releaseDate || '',
-    poster: movie.posterUrl || '/placeholder.svg',
-    description: movie.description || '',
-    trailerUrl: movie.trailerUrl || '',
-    director: movie.director || 'Unknown',
-    cast: movie.cast ? movie.cast.split(',').map((c: string) => c.trim()) : [],
+// Các API functions khác
+export async function getAllMovies() {
+  try {
+    const response = await api.get('/movies')
+    return response.data
+  } catch (error) {
+    console.error('Error fetching movies:', error)
+    throw error
   }
+}
+
+export async function getNowShowingMovies() {
+  try {
+    const response = await api.get('/movies/now-showing')
+    return response.data
+  } catch (error) {
+    console.error('Error fetching now showing movies:', error)
+    throw error
+  }
+}
+
+export async function getComingSoonMovies() {
+  try {
+    const response = await api.get('/movies/coming-soon')
+    return response.data
+  } catch (error) {
+    console.error('Error fetching coming soon movies:', error)
+    throw error
+  }
+}
+
+export async function searchMovies(query: string) {
+  try {
+    const response = await api.get('/movies/search', {
+      params: { title: query }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error searching movies:', error)
+    throw error
+  }
+}
+
+export function mapMovieForDisplay(movie: any) {
+  if (!movie) {
+      console.warn('⚠️ mapMovieForDisplay: movie is null/undefined')
+      return null
+}
+
+console.log('🎬 Mapping movie:', movie)
+console.log('📝 Genres from API:', movie.genres)
+
+
+let genreNames: string[] = []
+
+if (movie.genres && Array.isArray(movie.genres) && movie.genres.length > 0) {
+  genreNames = movie.genres.map((g: any) => g.name || g.genreName || g)
+}
+
+console.log('✅ Mapped genres:', genreNames)
+
+return {
+  id: movie.id,
+  title: movie.title || 'Untitled',
+  description: movie.description || '',
+  poster: movie.posterUrl || '/placeholder.svg',
+  rating: movie.ageRating?.code || movie.ageRating?.ratingCode || 'NR',
+  duration: movie.durationMinutes || 0,
+  releaseDate: movie.releaseDate || null,
+  director: movie.director || 'Unknown',
+  cast: movie.cast || [],
+  genre: genreNames, // ✅ Dùng biến đã map
+  trailerUrl: movie.trailerUrl || null,
+  status: movie.status || 'COMING_SOON'
+}
 }
 
 /**
