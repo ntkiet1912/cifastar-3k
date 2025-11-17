@@ -1,8 +1,10 @@
 package com.theatermgnt.theatermgnt.common.exception;
 
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+
+import lombok.Getter;
+
 @Getter
 public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR), // Code: 500
@@ -30,7 +32,7 @@ public enum ErrorCode {
     ACCOUNT_NOT_FOUND(1022, "Account not found", HttpStatus.NOT_FOUND),
     PASSWORDS_DO_NOT_MATCH(1023, "Password and Confirm password do not match", HttpStatus.BAD_REQUEST),
     CONFIRM_PASSWORD_REQUIRED(1024, "Confirm password is required", HttpStatus.BAD_REQUEST),
-    //----
+    // ----
     CINEMA_EXISTED(2001, "Cinema existed", HttpStatus.BAD_REQUEST),
     CINEMA_NOT_EXISTED(2002, "Cinema not existed", HttpStatus.BAD_REQUEST),
     ROOM_EXISTED(2003, "Room existed", HttpStatus.BAD_REQUEST),
@@ -46,7 +48,7 @@ public enum ErrorCode {
     COMBO_ITEM_EXISTED(2011, "Seat existed", HttpStatus.BAD_REQUEST),
     COMBO_ITEM_NOT_EXISTED(2012, "Seat not existed", HttpStatus.BAD_REQUEST),
 
-    //----
+    // ----
     CANNOT_SEND_EMAIL(3001, "Cannot send email", HttpStatus.BAD_REQUEST),
     ;
     private int code;
