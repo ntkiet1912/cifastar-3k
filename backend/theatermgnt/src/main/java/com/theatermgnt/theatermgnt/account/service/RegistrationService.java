@@ -23,8 +23,10 @@ import com.theatermgnt.theatermgnt.customer.service.CustomerService;
 import com.theatermgnt.theatermgnt.staff.dto.request.StaffAccountCreationRequest;
 import com.theatermgnt.theatermgnt.staff.dto.response.StaffResponse;
 import com.theatermgnt.theatermgnt.staff.entity.Staff;
+import com.theatermgnt.theatermgnt.staff.event.StaffCreatedEvent;
 import com.theatermgnt.theatermgnt.staff.mapper.StaffMapper;
 import com.theatermgnt.theatermgnt.staff.service.StaffService;
+import org.springframework.context.ApplicationEventPublisher;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,7 @@ public class RegistrationService {
     RoleRepository roleRepository;
     AccountRepository accountRepository;
     CustomerRepository customerRepository;
+    ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public CustomerResponse registerCustomerAccount(CustomerAccountCreationRequest request) {
@@ -98,6 +101,8 @@ public class RegistrationService {
         savedAccount.setAccountType(AccountType.INTERNAL);
 
         Staff savedStaff = staffService.createStaffProfile(request, savedAccount, roles);
+        eventPublisher.publishEvent(new StaffCreatedEvent(savedStaff,request.getPassword()));
+
         return staffMapper.toStaffResponse(savedStaff);
     }
 }

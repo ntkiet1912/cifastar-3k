@@ -8,14 +8,10 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Getter
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class PasswordResetEvent extends ApplicationEvent {
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+@Builder
+public class PasswordResetEvent {
     Account account;
     String otpCode;
-
-    public PasswordResetEvent(Object source, Account account, String otpCode) {
-        super(source);
-        this.account = account;
-        this.otpCode = otpCode;
-    }
 }

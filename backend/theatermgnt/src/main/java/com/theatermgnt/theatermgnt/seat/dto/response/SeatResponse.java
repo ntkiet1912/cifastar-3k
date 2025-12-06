@@ -10,8 +10,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SeatResponse {
     String id;
+    String seatName;
     String rowChair;
     Integer seatNumber;
-    String roomName;
-    String seatTypeName;
+    String seatTypeId;
 }

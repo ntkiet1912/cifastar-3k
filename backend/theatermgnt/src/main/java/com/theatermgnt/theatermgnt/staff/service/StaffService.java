@@ -15,6 +15,7 @@ import com.theatermgnt.theatermgnt.authorization.repository.RoleRepository;
 import com.theatermgnt.theatermgnt.common.exception.AppException;
 import com.theatermgnt.theatermgnt.common.exception.ErrorCode;
 import com.theatermgnt.theatermgnt.constant.PredefinedRole;
+import com.theatermgnt.theatermgnt.staff.dto.request.SearchStaffRequest;
 import com.theatermgnt.theatermgnt.staff.dto.request.StaffAccountCreationRequest;
 import com.theatermgnt.theatermgnt.staff.dto.request.StaffProfileUpdateRequest;
 import com.theatermgnt.theatermgnt.staff.dto.response.StaffResponse;
@@ -71,6 +72,15 @@ public class StaffService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return staffMapper.toStaffResponse(staff);
     }
+
+//    /// SEARCH STAFF BY NAME/EMAIL/PHONE
+    public List<StaffResponse> searchStaff(SearchStaffRequest request) {
+        List<Staff> staffs = staffRepository.findAllByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(request.getKeyword(), request.getKeyword());
+        return staffs.stream()
+                .map(staffMapper::toStaffResponse)
+                .toList();
+    }
+
 
     /// UPDATE STAFF PROFILE
     public StaffResponse updateStaffProfile(String staffId, StaffProfileUpdateRequest request) {

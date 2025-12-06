@@ -29,12 +29,11 @@ public class EmailTemplateFactory {
         context.setVariable("companyAddress", "123 Cifastar St, HCM City, Vietnam");
         context.setVariable("year", Year.now().getValue());
 
-        String templateName =
-                switch (emailType) {
-                    case RESET_PASSWORD -> "email/reset-password";
-                    case WELCOME_EMAIL -> "email/welcome-email";
-                    case NOTIFICATION_EMAIL -> "email/notification-email";
-                };
+        String templateName = switch (emailType) {
+            case RESET_PASSWORD -> "email/reset-password";
+            case WELCOME_STAFF -> "email/welcome-staff";
+            case NOTIFICATION_EMAIL -> "email/notification-email";
+        };
         return templateEngine.process(templateName, context);
     }
 }

@@ -22,17 +22,16 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "seats")
 @SQLDelete(sql = "UPDATE seats SET deleted = true WHERE id = ?")
 @Where(clause = "deleted = false")
+
 public class Seat extends BaseEntity {
     String rowChair;
     Integer seatNumber;
 
-    // Quan hệ nhiều-1 với Room
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "roomId", nullable = false)
+    @JoinColumn(name = "room_id", nullable = false)
     Room room;
 
-    // Quan hệ nhiều-1 với SeatType
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seatTypeId", nullable = false)
+    @JoinColumn(name = "seat_type_id", nullable = false)
     SeatType seatType;
 }
