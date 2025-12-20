@@ -17,9 +17,9 @@ export const getGenreById = async (genreId: string): Promise<Genre> => {
   );
 };
 
-export const createGenre = async (name: string): Promise<Genre> => {
+export const createGenre = async (data: { id: string; name: string }): Promise<Genre> => {
   return handleApiResponse<Genre>(
-    httpClient.post<ApiResponse<Genre>>(BASE_URL, { name })
+    httpClient.post<ApiResponse<Genre>>(BASE_URL, data)
   );
 };
 
@@ -29,6 +29,12 @@ export const updateGenre = async (
 ): Promise<Genre> => {
   return handleApiResponse<Genre>(
     httpClient.put<ApiResponse<Genre>>(`${BASE_URL}/${genreId}`, { name })
+  );
+};
+
+export const getMoviesUsingGenre = async (genreId: string): Promise<any[]> => {
+  return handleApiResponse<any[]>(
+    httpClient.get<ApiResponse<any[]>>(`${BASE_URL}/${genreId}/movies`)
   );
 };
 

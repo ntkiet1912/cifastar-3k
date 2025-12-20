@@ -18,11 +18,10 @@ export const getAgeRatingById = async (ageRatingId: string): Promise<AgeRating> 
 };
 
 export const createAgeRating = async (
-  code: string,
-  description: string
+  data: { id: string; code: string; description: string }
 ): Promise<AgeRating> => {
   return handleApiResponse<AgeRating>(
-    httpClient.post<ApiResponse<AgeRating>>(BASE_URL, { code, description })
+    httpClient.post<ApiResponse<AgeRating>>(BASE_URL, data)
   );
 };
 
@@ -36,6 +35,12 @@ export const updateAgeRating = async (
       code,
       description,
     })
+  );
+};
+
+export const getMoviesUsingAgeRating = async (ageRatingId: string): Promise<any[]> => {
+  return handleApiResponse<any[]>(
+    httpClient.get<ApiResponse<any[]>>(`${BASE_URL}/${ageRatingId}/movies`)
   );
 };
 

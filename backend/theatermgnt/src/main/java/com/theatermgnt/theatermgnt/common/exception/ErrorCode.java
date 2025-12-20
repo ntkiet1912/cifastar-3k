@@ -80,6 +80,8 @@ public enum ErrorCode {
     INVALID_MOVIE_STATUS(2040, "Movie status is required", HttpStatus.BAD_REQUEST),
     MOVIE_IN_USE(
             2041, "Cannot delete movie because it is referenced by screenings or bookings", HttpStatus.BAD_REQUEST),
+    GENRE_IN_USE(2042, "Cannot delete genre because it is being used by movies", HttpStatus.BAD_REQUEST),
+    AGERATING_IN_USE(2043, "Cannot delete age rating because it is being used by movies", HttpStatus.BAD_REQUEST),
     // -----
     CANNOT_SEND_EMAIL(3001, "Cannot send email", HttpStatus.BAD_REQUEST),
     ;

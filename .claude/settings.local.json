@@ -8,7 +8,8 @@
       "Bash(taskkill //F //PID 7384)",
       "Bash(npm run dev:*)",
       "Bash(python -m json.tool:*)",
-      "Bash(mvn clean compile:*)"
+      "Bash(mvn clean compile:*)",
+      "Bash(dir:*)"
     ]
   }
 }

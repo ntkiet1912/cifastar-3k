@@ -1,36 +1,28 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { SearchAddBar } from "@/components/ui/SearchAddBar";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { MovieTable } from "@/components/movies/MovieTable";
-import { MovieFormDialog } from "@/components/movies/MovieFormDialog";
+import { GenreManager } from "@/components/movies/GenreManager";
 import { useMovieManager } from "@/hooks/useMovieManager";
-import { getMovieById } from "@/services/movieService";
-import type { Movie, MovieSimple, CreateMovieRequest } from "@/types/MovieType/Movie";
-import { Search, X, Film } from "lucide-react";
-import { useNotificationStore } from "@/stores";
+import type { MovieSimple } from "@/types/MovieType/Movie";
+import { Search, X, Film, Settings } from "lucide-react";
+import { ROUTES } from "@/constants/routes";
 
 export function MovieList() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [filteredMovies, setFilteredMovies] = useState<MovieSimple[]>([]);
-  const [loadingMovie, setLoadingMovie] = useState(false);
-
-  const addNotification = useNotificationStore(
-    (state) => state.addNotification
-  );
+  const [genreManagerOpen, setGenreManagerOpen] = useState(false);
 
   const {
     movies,
     loading,
-    saving,
     confirmDialog,
     loadData,
-    handleCreateMovie,
-    handleUpdateMovie,
     handleDeleteMovie,
     closeConfirmDialog,
   } = useMovieManager();
@@ -68,39 +60,11 @@ export function MovieList() {
   }, [movies, searchQuery]);
 
   const handleOpenCreateDialog = () => {
-    setSelectedMovie(null);
-    setDialogOpen(true);
+    navigate(ROUTES.MOVIES_CREATE);
   };
 
-  const handleOpenEditDialog = async (movie: MovieSimple) => {
-    try {
-      setLoadingMovie(true);
-      // Load full movie details for editing
-      const fullMovie = await getMovieById(movie.id);
-      setSelectedMovie(fullMovie);
-      setDialogOpen(true);
-    } catch (error: any) {
-      addNotification({
-        type: "error",
-        title: "Error",
-        message: error?.response?.data?.message || "Failed to load movie details",
-      });
-    } finally {
-      setLoadingMovie(false);
-    }
-  };
-
-  const handleCloseDialog = () => {
-    setDialogOpen(false);
-    setSelectedMovie(null);
-  };
-
-  const handleSubmit = async (request: CreateMovieRequest) => {
-    if (selectedMovie) {
-      return await handleUpdateMovie(selectedMovie.id, request);
-    } else {
-      return await handleCreateMovie(request);
-    }
+  const handleOpenEditDialog = (movie: MovieSimple) => {
+    navigate(ROUTES.MOVIES_EDIT.replace(":id", movie.id));
   };
 
   const handleDelete = (movie: MovieSimple) => {
@@ -113,10 +77,20 @@ export function MovieList() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Movies Management"
-        description="Manage all movies in the system"
-      />
+      <div className="flex items-center justify-between">
+        <PageHeader
+          title="Movies Management"
+          description="Manage all movies in the system"
+        />
+        <Button
+          variant="outline"
+          onClick={() => setGenreManagerOpen(true)}
+          className="gap-2"
+        >
+          <Settings className="h-4 w-4" />
+          Manage Genres & Ratings
+        </Button>
+      </div>
 
       {/* Search and Actions Bar */}
       <SearchAddBar
@@ -156,17 +130,14 @@ export function MovieList() {
           isLoading={loading}
           onEdit={handleOpenEditDialog}
           onDelete={handleDelete}
-          updatingCell={saving || loadingMovie ? "updating" : undefined}
         />
       )}
 
-      {/* Movie Form Dialog */}
-      <MovieFormDialog
-        isOpen={dialogOpen}
-        onClose={handleCloseDialog}
-        onSubmit={handleSubmit}
-        movie={selectedMovie}
-        saving={saving}
+      {/* Genre Manager Dialog */}
+      <GenreManager
+        isOpen={genreManagerOpen}
+        onClose={() => setGenreManagerOpen(false)}
+        onUpdate={loadData}
       />
 
       {/* Confirmation Dialog */}
