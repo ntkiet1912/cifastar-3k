@@ -73,14 +73,12 @@ public class StaffService {
         return staffMapper.toStaffResponse(staff);
     }
 
-//    /// SEARCH STAFF BY NAME/EMAIL/PHONE
+    //    /// SEARCH STAFF BY NAME/EMAIL/PHONE
     public List<StaffResponse> searchStaff(SearchStaffRequest request) {
-        List<Staff> staffs = staffRepository.findAllByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(request.getKeyword(), request.getKeyword());
-        return staffs.stream()
-                .map(staffMapper::toStaffResponse)
-                .toList();
+        List<Staff> staffs = staffRepository.findAllByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(
+                request.getKeyword(), request.getKeyword());
+        return staffs.stream().map(staffMapper::toStaffResponse).toList();
     }
-
 
     /// UPDATE STAFF PROFILE
     public StaffResponse updateStaffProfile(String staffId, StaffProfileUpdateRequest request) {
@@ -95,7 +93,6 @@ public class StaffService {
 
         staffMapper.updateStaffProfile(staffToUpdate, request);
         if (isCallerAdmin && request.getRoles() != null) {
-            log.info("Updating roles for staff: {}", staffId);
             var roles = roleRepository.findAllById(request.getRoles());
             staffToUpdate.setRoles(new HashSet<>(roles));
         }

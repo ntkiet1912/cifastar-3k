@@ -1,0 +1,44 @@
+import httpClient from "@/configurations/httpClient";
+import type { AgeRating } from "@/types/MovieType/Movie";
+import { handleApiResponse } from "@/utils/apiResponse";
+import type { ApiResponse } from "@/utils/apiResponse";
+
+const BASE_URL = "/age_ratings";
+
+export const getAllAgeRatings = async (): Promise<AgeRating[]> => {
+  return handleApiResponse<AgeRating[]>(
+    httpClient.get<ApiResponse<AgeRating[]>>(BASE_URL)
+  );
+};
+
+export const getAgeRatingById = async (ageRatingId: string): Promise<AgeRating> => {
+  return handleApiResponse<AgeRating>(
+    httpClient.get<ApiResponse<AgeRating>>(`${BASE_URL}/${ageRatingId}`)
+  );
+};
+
+export const createAgeRating = async (
+  code: string,
+  description: string
+): Promise<AgeRating> => {
+  return handleApiResponse<AgeRating>(
+    httpClient.post<ApiResponse<AgeRating>>(BASE_URL, { code, description })
+  );
+};
+
+export const updateAgeRating = async (
+  ageRatingId: string,
+  code: string,
+  description: string
+): Promise<AgeRating> => {
+  return handleApiResponse<AgeRating>(
+    httpClient.put<ApiResponse<AgeRating>>(`${BASE_URL}/${ageRatingId}`, {
+      code,
+      description,
+    })
+  );
+};
+
+export const deleteAgeRating = async (ageRatingId: string): Promise<void> => {
+  await httpClient.delete(`${BASE_URL}/${ageRatingId}`);
+};
