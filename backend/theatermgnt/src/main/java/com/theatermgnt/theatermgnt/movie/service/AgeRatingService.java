@@ -8,9 +8,12 @@ import com.theatermgnt.theatermgnt.common.exception.AppException;
 import com.theatermgnt.theatermgnt.common.exception.ErrorCode;
 import com.theatermgnt.theatermgnt.movie.dto.request.CreateAgeRatingRequest;
 import com.theatermgnt.theatermgnt.movie.dto.response.AgeRatingResponse;
+import com.theatermgnt.theatermgnt.movie.dto.response.MovieSimpleResponse;
 import com.theatermgnt.theatermgnt.movie.entity.AgeRating;
 import com.theatermgnt.theatermgnt.movie.mapper.AgeRatingMapper;
+import com.theatermgnt.theatermgnt.movie.mapper.MovieMapper;
 import com.theatermgnt.theatermgnt.movie.repository.AgeRatingRepository;
+import com.theatermgnt.theatermgnt.movie.repository.MovieRepository;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,8 @@ public class AgeRatingService {
 
     AgeRatingRepository ageRatingRepository;
     AgeRatingMapper ageRatingMapper;
+    MovieRepository movieRepository;
+    MovieMapper movieMapper;
 
     // CREATE
     public AgeRatingResponse createAgeRating(CreateAgeRatingRequest request) {
@@ -60,5 +65,29 @@ public class AgeRatingService {
                 .findByCode(code)
                 .orElseThrow(() -> new AppException(ErrorCode.AGERATING_NOT_EXISTED));
         return ageRatingMapper.toAgeRatingResponse(ageRating);
+    }
+
+    // Get movies using this age rating
+    public List<MovieSimpleResponse> getMoviesUsingAgeRating(String id) {
+        if (!ageRatingRepository.existsById(id)) {
+            throw new AppException(ErrorCode.AGERATING_NOT_EXISTED);
+        }
+        return movieRepository.findByAgeRatingId(id).stream()
+                .map(movieMapper::toMovieSimpleResponse)
+                .toList();
+    }
+
+    // DELETE
+    public void deleteAgeRating(String id) {
+        if (!ageRatingRepository.existsById(id)) {
+            throw new AppException(ErrorCode.AGERATING_NOT_EXISTED);
+        }
+
+        // Check if age rating is being used by any movies
+        if (movieRepository.existsByAgeRatingId(id)) {
+            throw new AppException(ErrorCode.AGERATING_IN_USE);
+        }
+
+        ageRatingRepository.deleteById(id);
     }
 }
