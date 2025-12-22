@@ -93,6 +93,16 @@ public enum ErrorCode {
     AGERATING_IN_USE(2043, "Cannot delete age rating because it is being used by movies", HttpStatus.BAD_REQUEST),
     // -----
     CANNOT_SEND_EMAIL(3001, "Cannot send email", HttpStatus.BAD_REQUEST),
+    // Review
+    REVIEW_NOT_EXISTED(5001, "Review not existed", HttpStatus.NOT_FOUND),
+    REVIEW_ALREADY_EXISTS(5002, "Customer already reviewed this movie", HttpStatus.BAD_REQUEST),
+    REVIEW_UNAUTHORIZED(5003, "You are not authorized to modify this review", HttpStatus.FORBIDDEN),
+    CUSTOMER_ID_REQUIRED(5004, "Customer ID is required", HttpStatus.BAD_REQUEST),
+    MOVIE_ID_REQUIRED(5005, "Movie ID is required", HttpStatus.BAD_REQUEST),
+    RATING_REQUIRED(5006, "Rating is required", HttpStatus.BAD_REQUEST),
+    RATING_MIN_0_5(5007, "Rating must be at least 0.5", HttpStatus.BAD_REQUEST),
+    RATING_MAX_10(5008, "Rating must not exceed 10.0", HttpStatus.BAD_REQUEST),
+    COMMENT_TOO_LONG(5009, "Comment must not exceed {max} characters", HttpStatus.BAD_REQUEST),
     ;
     private int code;
     private String message;
