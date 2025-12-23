@@ -3,7 +3,8 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { SearchAddBar } from "@/components/ui/SearchAddBar";
+import { ReviewTable } from "@/components/reviews/ReviewTable";
 import {
   Select,
   SelectContent,
@@ -11,21 +12,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Star, Trash2, Search, MessageSquare, Film } from "lucide-react";
+import { MessageSquare, Film, X, Search } from "lucide-react";
 import { getReviewsByMovieId, deleteReview } from "@/services/reviewService";
 import { getAllMovies } from "@/services/movieService";
 import type { MovieReview } from "@/types/review";
 import type { MovieSimple } from "@/types/MovieType/Movie";
-import { format } from "date-fns";
 import { toast } from "sonner";
 
 export function ReviewList() {
@@ -175,146 +166,45 @@ export function ReviewList() {
 
       {/* Search Bar */}
       {selectedMovie && (
-        <div className="flex items-center gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by customer or comment..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MessageSquare className="h-4 w-4" />
-            <span>
-              {filteredReviews.length} of {reviews.length} reviews
-            </span>
-          </div>
-        </div>
+        <SearchAddBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          placeholder="Search by customer or comment..."
+          totalCount={reviews.length}
+          filteredCount={filteredReviews.length}
+          icon={<MessageSquare className="w-4 h-4" />}
+          label="reviews"
+          showAddButton={false}
+        />
       )}
 
       {/* Reviews Table */}
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Customer</TableHead>
-              <TableHead>Movie</TableHead>
-              <TableHead>Rating</TableHead>
-              <TableHead>Comment</TableHead>
-              <TableHead>Helpful</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {!selectedMovie ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-12">
-                  <div className="flex flex-col items-center gap-2">
-                    <Film className="h-12 w-12 text-muted-foreground" />
-                    <p className="text-lg font-medium">Select a movie</p>
-                    <p className="text-muted-foreground">
-                      Choose a movie from the dropdown above to view its reviews
-                    </p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : loading ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-                    <span>Loading reviews...</span>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : filteredReviews.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-8">
-                  <div className="flex flex-col items-center gap-2">
-                    <MessageSquare className="h-12 w-12 text-muted-foreground" />
-                    <p className="text-muted-foreground">
-                      {searchQuery
-                        ? "No reviews match your search"
-                        : "No reviews yet for this movie"}
-                    </p>
-                    {searchQuery && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSearchQuery("")}
-                      >
-                        Clear search
-                      </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredReviews.map((review) => (
-                <TableRow key={review.id}>
-                  <TableCell>
-                    <div className="font-medium">
-                      {review.customer.firstName} {review.customer.lastName}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium">{review.movie.title}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-medium">{review.rating}</span>
-                      <span className="text-muted-foreground">/10</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="max-w-md truncate">
-                      {review.comment || (
-                        <span className="text-muted-foreground italic">
-                          No comment
-                        </span>
-                      )}
-                    </div>
-                    {review.isSpoiler && (
-                      <Badge variant="destructive" className="mt-1">
-                        Spoiler
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex flex-col gap-1 text-sm">
-                      <span className="text-green-600">
-                        👍 {review.helpfulCount}
-                      </span>
-                      <span className="text-red-600">
-                        👎 {review.unhelpfulCount}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm text-muted-foreground">
-                      {format(new Date(review.createdAt), "MMM dd, yyyy")}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteClick(review)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      {searchQuery.trim() && filteredReviews.length === 0 && !loading && selectedMovie ? (
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <Search className="w-12 h-12 text-muted-foreground mb-4" />
+          <h3 className="text-lg font-medium text-foreground mb-2">
+            No reviews found
+          </h3>
+          <p className="text-muted-foreground mb-4">
+            No reviews match your search for "{searchQuery}"
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => setSearchQuery("")}
+            className="gap-2"
+          >
+            <X className="w-4 h-4" />
+            Clear search
+          </Button>
+        </div>
+      ) : (
+        <ReviewTable
+          reviews={filteredReviews}
+          isLoading={loading}
+          onDelete={handleDeleteClick}
+          selectedMovie={!!selectedMovie}
+        />
+      )}
 
       {/* Confirmation Dialog */}
       <ConfirmDialog
