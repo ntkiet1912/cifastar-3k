@@ -105,6 +105,7 @@ public enum ErrorCode {
     RATING_MAX_10(5008, "Rating must not exceed 10.0", HttpStatus.BAD_REQUEST),
     COMMENT_TOO_LONG(5009, "Comment must not exceed {max} characters", HttpStatus.BAD_REQUEST),
     CANNOT_VOTE_OWN_REVIEW(5010, "You cannot vote on your own review", HttpStatus.BAD_REQUEST),
+    MOVIE_NOT_SHOWING(5011, "Reviews are only available for movies currently showing", HttpStatus.BAD_REQUEST),
     ;
     private int code;
     private String message;

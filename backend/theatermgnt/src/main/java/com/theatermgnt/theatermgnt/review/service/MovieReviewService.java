@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.theatermgnt.theatermgnt.common.enums.MovieStatus;
 import com.theatermgnt.theatermgnt.common.exception.AppException;
 import com.theatermgnt.theatermgnt.common.exception.ErrorCode;
 import com.theatermgnt.theatermgnt.customer.entity.Customer;
@@ -65,6 +66,11 @@ public class MovieReviewService {
             Movie movie = movieRepository
                     .findById(request.getMovieId())
                     .orElseThrow(() -> new AppException(ErrorCode.MOVIE_NOT_EXISTED));
+
+            // Check if movie is currently showing
+            if (movie.getStatus() != MovieStatus.now_showing) {
+                throw new AppException(ErrorCode.MOVIE_NOT_SHOWING);
+            }
 
             // Check if customer already reviewed this movie
             if (reviewRepository.existsByCustomerIdAndMovieId(request.getCustomerId(), request.getMovieId())) {

@@ -19,9 +19,10 @@ import { MessageSquarePlus } from "lucide-react";
 interface ReviewsSectionProps {
   movieId: string;
   customerId?: string;
+  movieStatus?: string;
 }
 
-export function ReviewsSection({ movieId, customerId: customerIdProp }: ReviewsSectionProps) {
+export function ReviewsSection({ movieId, customerId: customerIdProp, movieStatus }: ReviewsSectionProps) {
   const { isAuthenticated } = useAuthStore();
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [customerId, setCustomerId] = useState<string | undefined>(customerIdProp);
@@ -104,12 +105,17 @@ export function ReviewsSection({ movieId, customerId: customerIdProp }: ReviewsS
     setShowReviewForm(false);
   };
 
+  // Check if movie is currently showing (allow reviews)
+  // Backend returns 'now_showing' (lowercase with underscore)
+  const isMovieShowing = movieStatus === 'now_showing';
+  const canWriteReview = isAuthenticated && customerId && isMovieShowing;
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Reviews & Ratings</h2>
-        {isAuthenticated && customerId && !showReviewForm ? (
+        {canWriteReview && !showReviewForm ? (
           <Button onClick={() => setShowReviewForm(true)} className="gap-2">
             <MessageSquarePlus className="h-4 w-4" />
             Write a Review
@@ -117,6 +123,10 @@ export function ReviewsSection({ movieId, customerId: customerIdProp }: ReviewsS
         ) : !isAuthenticated ? (
           <p className="text-sm text-gray-500">
             Please login to write a review
+          </p>
+        ) : !isMovieShowing ? (
+          <p className="text-sm text-gray-500">
+            Reviews are only available for movies currently showing
           </p>
         ) : loadingCustomerId ? (
           <p className="text-sm text-gray-500">
@@ -133,7 +143,7 @@ export function ReviewsSection({ movieId, customerId: customerIdProp }: ReviewsS
       )}
 
       {/* Review Form */}
-      {showReviewForm && isAuthenticated && customerId && (
+      {showReviewForm && canWriteReview && (
         <Card>
           <CardHeader>
             <CardTitle>Write Your Review</CardTitle>

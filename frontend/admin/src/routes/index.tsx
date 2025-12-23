@@ -8,6 +8,7 @@ import { PermissionList } from "@/pages/Permissions";
 import { RoleList } from "@/pages/Roles";
 import { MovieList, CreateMovie, EditMovie } from "@/pages/Movies";
 import { ShowtimeList } from "@/pages/Showtimes";
+import { ReviewList } from "@/pages/Reviews";
 import { TheaterList } from "@/pages/Cinemas";
 import { RoomList, CreateRoom, EditRoom } from "@/pages/Rooms";
 import { TicketList } from "@/pages/Tickets";
@@ -273,6 +274,18 @@ export const routes = [
               {
                 index: true,
                 element: <ReportList />,
+              },
+            ],
+          },
+          {
+            path: `${ROUTES.REVIEWS}`,
+            element: (
+              <ProtectedRoute requiredPermissions={[PERMISSIONS.REVIEW_READ]} />
+            ),
+            children: [
+              {
+                index: true,
+                element: <ReviewList />,
               },
             ],
           },

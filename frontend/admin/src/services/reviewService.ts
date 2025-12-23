@@ -1,6 +1,6 @@
 import httpClient from "@/configurations/httpClient";
 import { handleApiResponse } from "@/utils/apiResponse";
-import type { ApiResponse } from "@/types/ApiResponse";
+import type { ApiResponse } from "@/utils/apiResponse";
 import type {
   MovieReview,
   CreateReviewRequest,

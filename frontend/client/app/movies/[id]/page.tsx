@@ -241,7 +241,7 @@ export default function MovieDetailPage({ params }: { params: Promise<{ id: stri
 
       {/* Reviews & Ratings Section */}
       <div className="container-max px-4 md:px-8 py-12 border-t border-border dark:border-slate-800">
-        <ReviewsSection movieId={id} />
+        <ReviewsSection movieId={id} movieStatus={movie.status} />
       </div>
     </div>
   )
