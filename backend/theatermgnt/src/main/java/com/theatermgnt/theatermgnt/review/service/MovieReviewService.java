@@ -24,8 +24,11 @@ import com.theatermgnt.theatermgnt.review.dto.request.UpdateReviewRequest;
 import com.theatermgnt.theatermgnt.review.dto.response.MovieRatingStatsResponse;
 import com.theatermgnt.theatermgnt.review.dto.response.ReviewResponse;
 import com.theatermgnt.theatermgnt.review.entity.MovieReview;
+import com.theatermgnt.theatermgnt.review.entity.ReviewVote;
+import com.theatermgnt.theatermgnt.review.entity.VoteType;
 import com.theatermgnt.theatermgnt.review.mapper.MovieReviewMapper;
 import com.theatermgnt.theatermgnt.review.repository.MovieReviewRepository;
+import com.theatermgnt.theatermgnt.review.repository.ReviewVoteRepository;
 import com.theatermgnt.theatermgnt.screening.entity.Screening;
 import com.theatermgnt.theatermgnt.screening.repository.ScreeningRepository;
 
@@ -41,6 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MovieReviewService {
 
     MovieReviewRepository reviewRepository;
+    ReviewVoteRepository reviewVoteRepository;
     CustomerRepository customerRepository;
     MovieRepository movieRepository;
     ScreeningRepository screeningRepository;
@@ -189,6 +193,23 @@ public class MovieReviewService {
                 .build();
     }
 
+    /**
+     * Get user's votes for a list of reviews
+     * Returns a map of reviewId -> VoteType
+     */
+    public Map<String, VoteType> getUserVotesForReviews(String customerId, List<String> reviewIds) {
+        if (reviewIds == null || reviewIds.isEmpty()) {
+            return Map.of();
+        }
+
+        List<ReviewVote> votes = reviewVoteRepository.findByCustomerIdAndReviewIdIn(customerId, reviewIds);
+        return votes.stream()
+                .collect(Collectors.toMap(
+                        vote -> vote.getReview().getId(),
+                        ReviewVote::getVoteType
+                ));
+    }
+
     // ========== UPDATE ==========
     @Transactional
     public ReviewResponse updateReview(String reviewId, UpdateReviewRequest request) {
@@ -206,26 +227,127 @@ public class MovieReviewService {
     }
 
     @Transactional
-    public ReviewResponse markReviewAsHelpful(String reviewId) {
+    public ReviewResponse markReviewAsHelpful(String reviewId, String customerId) {
+        // Validate review exists
         MovieReview review = reviewRepository
                 .findById(reviewId)
                 .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXISTED));
 
-        review.setHelpfulCount(review.getHelpfulCount() + 1);
-        MovieReview updatedReview = reviewRepository.save(review);
+        // Validate customer exists
+        Customer customer = customerRepository
+                .findById(customerId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
+        // Check if user already voted on this review
+        var existingVote = reviewVoteRepository.findByCustomerIdAndReviewId(customerId, reviewId);
+
+        if (existingVote.isPresent()) {
+            ReviewVote vote = existingVote.get();
+
+            // Check if vote was previously soft-deleted
+            if (Boolean.TRUE.equals(vote.getDeleted())) {
+                vote.setDeleted(false);
+                vote.setVoteType(VoteType.HELPFUL);
+                reviewVoteRepository.save(vote);
+                review.setHelpfulCount(review.getHelpfulCount() + 1);
+            }
+            // If already voted helpful, remove the vote (toggle off)
+            else if (vote.getVoteType() == VoteType.HELPFUL) {
+                vote.setDeleted(true);
+                reviewVoteRepository.save(vote);
+                review.setHelpfulCount(Math.max(0, review.getHelpfulCount() - 1));
+            } else {
+                // If voted unhelpful, switch to helpful
+                vote.setVoteType(VoteType.HELPFUL);
+                reviewVoteRepository.save(vote);
+
+                // Update counts
+                review.setUnhelpfulCount(Math.max(0, review.getUnhelpfulCount() - 1));
+                review.setHelpfulCount(review.getHelpfulCount() + 1);
+            }
+        } else {
+            // Create new helpful vote
+            ReviewVote newVote = new ReviewVote();
+            newVote.setReview(review);
+            newVote.setCustomer(customer);
+            newVote.setVoteType(VoteType.HELPFUL);
+            newVote.setDeleted(false);
+            reviewVoteRepository.save(newVote);
+
+            // Update count
+            review.setHelpfulCount(review.getHelpfulCount() + 1);
+        }
+
+        MovieReview updatedReview = reviewRepository.save(review);
         return reviewMapper.toReviewResponse(updatedReview);
     }
 
     @Transactional
-    public ReviewResponse markReviewAsUnhelpful(String reviewId) {
+    public ReviewResponse markReviewAsUnhelpful(String reviewId, String customerId) {
+        log.info("=== markReviewAsUnhelpful START: reviewId={}, customerId={}", reviewId, customerId);
+
+        // Validate review exists
         MovieReview review = reviewRepository
                 .findById(reviewId)
                 .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXISTED));
+        log.info("✅ Review found: {}", review.getId());
 
-        review.setUnhelpfulCount(review.getUnhelpfulCount() + 1);
+        // Validate customer exists
+        Customer customer = customerRepository
+                .findById(customerId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        log.info("✅ Customer found: {}", customer.getId());
+
+        // Check if user already voted on this review
+        log.info("🔍 Searching for existing vote: customerId={}, reviewId={}", customerId, reviewId);
+        var existingVote = reviewVoteRepository.findByCustomerIdAndReviewId(customerId, reviewId);
+        log.info("🔍 Query result: isPresent={}", existingVote.isPresent());
+
+        if (existingVote.isPresent()) {
+            ReviewVote vote = existingVote.get();
+            log.info("✅ Found existing vote: id={}, voteType={}, deleted={}", vote.getId(), vote.getVoteType(), vote.getDeleted());
+
+            // Check if vote was previously soft-deleted
+            if (Boolean.TRUE.equals(vote.getDeleted())) {
+                log.info("🔓 Undeleting and updating vote to UNHELPFUL");
+                vote.setDeleted(false);
+                vote.setVoteType(VoteType.UNHELPFUL);
+                reviewVoteRepository.save(vote);
+                review.setUnhelpfulCount(review.getUnhelpfulCount() + 1);
+            }
+            // If already voted unhelpful, remove the vote (toggle off)
+            else if (vote.getVoteType() == VoteType.UNHELPFUL) {
+                log.info("♻️ Soft-deleting unhelpful vote for review {} by customer {}", reviewId, customerId);
+                vote.setDeleted(true);
+                reviewVoteRepository.save(vote);
+                review.setUnhelpfulCount(Math.max(0, review.getUnhelpfulCount() - 1));
+            } else {
+                // If voted helpful, switch to unhelpful
+                log.info("🔄 Switching vote from helpful to unhelpful for review {} by customer {}", reviewId, customerId);
+                vote.setVoteType(VoteType.UNHELPFUL);
+                reviewVoteRepository.save(vote);
+
+                // Update counts
+                review.setHelpfulCount(Math.max(0, review.getHelpfulCount() - 1));
+                review.setUnhelpfulCount(review.getUnhelpfulCount() + 1);
+            }
+        } else {
+            log.warn("⚠️ No existing vote found, creating new one");
+            // Create new unhelpful vote
+            log.info("➕ Creating new unhelpful vote for review {} by customer {}", reviewId, customerId);
+            ReviewVote newVote = new ReviewVote();
+            newVote.setReview(review);
+            newVote.setCustomer(customer);
+            newVote.setVoteType(VoteType.UNHELPFUL);
+            newVote.setDeleted(false);
+            reviewVoteRepository.save(newVote);
+
+            // Update count
+            review.setUnhelpfulCount(review.getUnhelpfulCount() + 1);
+        }
+
         MovieReview updatedReview = reviewRepository.save(review);
-
+        log.info("=== markReviewAsUnhelpful END");
         return reviewMapper.toReviewResponse(updatedReview);
     }
 

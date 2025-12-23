@@ -1,6 +1,7 @@
 package com.theatermgnt.theatermgnt.review.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import jakarta.validation.Valid;
 
@@ -12,6 +13,7 @@ import com.theatermgnt.theatermgnt.review.dto.request.CreateReviewRequest;
 import com.theatermgnt.theatermgnt.review.dto.request.UpdateReviewRequest;
 import com.theatermgnt.theatermgnt.review.dto.response.MovieRatingStatsResponse;
 import com.theatermgnt.theatermgnt.review.dto.response.ReviewResponse;
+import com.theatermgnt.theatermgnt.review.entity.VoteType;
 import com.theatermgnt.theatermgnt.review.service.MovieReviewService;
 
 import lombok.AccessLevel;
@@ -107,16 +109,38 @@ public class MovieReviewController {
     }
 
     @PatchMapping("/{reviewId}/helpful")
-    ApiResponse<ReviewResponse> markReviewAsHelpful(@PathVariable("reviewId") String reviewId) {
+    ApiResponse<ReviewResponse> markReviewAsHelpful(
+            @PathVariable("reviewId") String reviewId,
+            @RequestParam(value = "customerId", required = true) String customerId) {
+        log.info("Received helpful request: reviewId={}, customerId={}", reviewId, customerId);
         return ApiResponse.<ReviewResponse>builder()
-                .result(reviewService.markReviewAsHelpful(reviewId))
+                .result(reviewService.markReviewAsHelpful(reviewId, customerId))
                 .build();
     }
 
     @PatchMapping("/{reviewId}/unhelpful")
-    ApiResponse<ReviewResponse> markReviewAsUnhelpful(@PathVariable("reviewId") String reviewId) {
+    ApiResponse<ReviewResponse> markReviewAsUnhelpful(
+            @PathVariable("reviewId") String reviewId,
+            @RequestParam(value = "customerId", required = true) String customerId) {
+        log.info("Received unhelpful request: reviewId={}, customerId={}", reviewId, customerId);
         return ApiResponse.<ReviewResponse>builder()
-                .result(reviewService.markReviewAsUnhelpful(reviewId))
+                .result(reviewService.markReviewAsUnhelpful(reviewId, customerId))
+                .build();
+    }
+
+    @GetMapping("/votes")
+    ApiResponse<Map<String, String>> getUserVotes(
+            @RequestParam("customerId") String customerId,
+            @RequestParam("reviewIds") List<String> reviewIds) {
+        Map<String, VoteType> votes = reviewService.getUserVotesForReviews(customerId, reviewIds);
+        // Convert VoteType enum to String for JSON response
+        Map<String, String> voteStrings = votes.entrySet().stream()
+                .collect(java.util.stream.Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().name()
+                ));
+        return ApiResponse.<Map<String, String>>builder()
+                .result(voteStrings)
                 .build();
     }
 
