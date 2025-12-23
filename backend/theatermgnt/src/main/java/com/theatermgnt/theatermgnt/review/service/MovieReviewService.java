@@ -67,8 +67,7 @@ public class MovieReviewService {
                     .orElseThrow(() -> new AppException(ErrorCode.MOVIE_NOT_EXISTED));
 
             // Check if customer already reviewed this movie
-            if (reviewRepository.existsByCustomerIdAndMovieId(
-                    request.getCustomerId(), request.getMovieId())) {
+            if (reviewRepository.existsByCustomerIdAndMovieId(request.getCustomerId(), request.getMovieId())) {
                 throw new AppException(ErrorCode.REVIEW_ALREADY_EXISTS);
             }
 
@@ -155,9 +154,8 @@ public class MovieReviewService {
     }
 
     public ReviewResponse getReviewById(String reviewId) {
-        MovieReview review = reviewRepository
-                .findById(reviewId)
-                .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXISTED));
+        MovieReview review =
+                reviewRepository.findById(reviewId).orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXISTED));
 
         return reviewMapper.toReviewResponse(review);
     }
@@ -203,19 +201,14 @@ public class MovieReviewService {
         }
 
         List<ReviewVote> votes = reviewVoteRepository.findByCustomerIdAndReviewIdIn(customerId, reviewIds);
-        return votes.stream()
-                .collect(Collectors.toMap(
-                        vote -> vote.getReview().getId(),
-                        ReviewVote::getVoteType
-                ));
+        return votes.stream().collect(Collectors.toMap(vote -> vote.getReview().getId(), ReviewVote::getVoteType));
     }
 
     // ========== UPDATE ==========
     @Transactional
     public ReviewResponse updateReview(String reviewId, UpdateReviewRequest request) {
-        MovieReview review = reviewRepository
-                .findById(reviewId)
-                .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXISTED));
+        MovieReview review =
+                reviewRepository.findById(reviewId).orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXISTED));
 
         // Update fields using MapStruct
         reviewMapper.updateMovieReviewFromRequest(request, review);
@@ -229,14 +222,17 @@ public class MovieReviewService {
     @Transactional
     public ReviewResponse markReviewAsHelpful(String reviewId, String customerId) {
         // Validate review exists
-        MovieReview review = reviewRepository
-                .findById(reviewId)
-                .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXISTED));
+        MovieReview review =
+                reviewRepository.findById(reviewId).orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXISTED));
 
         // Validate customer exists
-        Customer customer = customerRepository
-                .findById(customerId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Customer customer =
+                customerRepository.findById(customerId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        // Check if user is trying to vote on their own review
+        if (review.getCustomer().getId().equals(customerId)) {
+            throw new AppException(ErrorCode.CANNOT_VOTE_OWN_REVIEW);
+        }
 
         // Check if user already voted on this review
         var existingVote = reviewVoteRepository.findByCustomerIdAndReviewId(customerId, reviewId);
@@ -287,16 +283,19 @@ public class MovieReviewService {
         log.info("=== markReviewAsUnhelpful START: reviewId={}, customerId={}", reviewId, customerId);
 
         // Validate review exists
-        MovieReview review = reviewRepository
-                .findById(reviewId)
-                .orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXISTED));
+        MovieReview review =
+                reviewRepository.findById(reviewId).orElseThrow(() -> new AppException(ErrorCode.REVIEW_NOT_EXISTED));
         log.info("✅ Review found: {}", review.getId());
 
         // Validate customer exists
-        Customer customer = customerRepository
-                .findById(customerId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        Customer customer =
+                customerRepository.findById(customerId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         log.info("✅ Customer found: {}", customer.getId());
+
+        // Check if user is trying to vote on their own review
+        if (review.getCustomer().getId().equals(customerId)) {
+            throw new AppException(ErrorCode.CANNOT_VOTE_OWN_REVIEW);
+        }
 
         // Check if user already voted on this review
         log.info("🔍 Searching for existing vote: customerId={}, reviewId={}", customerId, reviewId);
@@ -305,7 +304,11 @@ public class MovieReviewService {
 
         if (existingVote.isPresent()) {
             ReviewVote vote = existingVote.get();
-            log.info("✅ Found existing vote: id={}, voteType={}, deleted={}", vote.getId(), vote.getVoteType(), vote.getDeleted());
+            log.info(
+                    "✅ Found existing vote: id={}, voteType={}, deleted={}",
+                    vote.getId(),
+                    vote.getVoteType(),
+                    vote.getDeleted());
 
             // Check if vote was previously soft-deleted
             if (Boolean.TRUE.equals(vote.getDeleted())) {
@@ -323,7 +326,10 @@ public class MovieReviewService {
                 review.setUnhelpfulCount(Math.max(0, review.getUnhelpfulCount() - 1));
             } else {
                 // If voted helpful, switch to unhelpful
-                log.info("🔄 Switching vote from helpful to unhelpful for review {} by customer {}", reviewId, customerId);
+                log.info(
+                        "🔄 Switching vote from helpful to unhelpful for review {} by customer {}",
+                        reviewId,
+                        customerId);
                 vote.setVoteType(VoteType.UNHELPFUL);
                 reviewVoteRepository.save(vote);
 

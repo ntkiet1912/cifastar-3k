@@ -1,22 +1,22 @@
 package com.theatermgnt.theatermgnt.review.entity;
 
+import jakarta.persistence.*;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import com.theatermgnt.theatermgnt.common.entity.BaseEntity;
 import com.theatermgnt.theatermgnt.customer.entity.Customer;
-import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 @Entity
 @Table(
-    name = "review_votes",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"customer_id", "review_id"})
-    }
-)
+        name = "review_votes",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"customer_id", "review_id"})})
 @SQLDelete(sql = "UPDATE review_votes SET deleted = true WHERE id = ?")
 @Where(clause = "deleted = false")
 @Getter

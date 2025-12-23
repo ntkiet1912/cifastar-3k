@@ -56,7 +56,8 @@ public enum ErrorCode {
     SCREENING_TIME_OVERLAP(4005, "Already has the same screening's time", HttpStatus.BAD_REQUEST),
     SEAT_NOT_IN_ROOM(4006, "This seat is not in our rooms", HttpStatus.BAD_REQUEST),
     SCREENING_SEAT_INVALID_STATUS_CHANGE(4007, "Cannot change screening seat's status (SOLD)", HttpStatus.BAD_REQUEST),
-    SCREENING_SEAT_CANNOT_DELETE(4008, "Only screening seats with AVAILABLE status can be deleted", HttpStatus.BAD_REQUEST),
+    SCREENING_SEAT_CANNOT_DELETE(
+            4008, "Only screening seats with AVAILABLE status can be deleted", HttpStatus.BAD_REQUEST),
     // AgeRating
     AGERATING_EXISTED(2015, "Age rating existed", HttpStatus.BAD_REQUEST),
     AGERATING_NOT_EXISTED(2016, "Age rating not existed", HttpStatus.NOT_FOUND),
@@ -103,6 +104,7 @@ public enum ErrorCode {
     RATING_MIN_0_5(5007, "Rating must be at least 0.5", HttpStatus.BAD_REQUEST),
     RATING_MAX_10(5008, "Rating must not exceed 10.0", HttpStatus.BAD_REQUEST),
     COMMENT_TOO_LONG(5009, "Comment must not exceed {max} characters", HttpStatus.BAD_REQUEST),
+    CANNOT_VOTE_OWN_REVIEW(5010, "You cannot vote on your own review", HttpStatus.BAD_REQUEST),
     ;
     private int code;
     private String message;

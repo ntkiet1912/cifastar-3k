@@ -130,18 +130,13 @@ public class MovieReviewController {
 
     @GetMapping("/votes")
     ApiResponse<Map<String, String>> getUserVotes(
-            @RequestParam("customerId") String customerId,
-            @RequestParam("reviewIds") List<String> reviewIds) {
+            @RequestParam("customerId") String customerId, @RequestParam("reviewIds") List<String> reviewIds) {
         Map<String, VoteType> votes = reviewService.getUserVotesForReviews(customerId, reviewIds);
         // Convert VoteType enum to String for JSON response
         Map<String, String> voteStrings = votes.entrySet().stream()
                 .collect(java.util.stream.Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> e.getValue().name()
-                ));
-        return ApiResponse.<Map<String, String>>builder()
-                .result(voteStrings)
-                .build();
+                        Map.Entry::getKey, e -> e.getValue().name()));
+        return ApiResponse.<Map<String, String>>builder().result(voteStrings).build();
     }
 
     // ========== DELETE ==========
@@ -149,6 +144,8 @@ public class MovieReviewController {
     @DeleteMapping("/{reviewId}")
     ApiResponse<String> deleteReview(@PathVariable("reviewId") String reviewId) {
         reviewService.deleteReview(reviewId);
-        return ApiResponse.<String>builder().result("Review deleted successfully").build();
+        return ApiResponse.<String>builder()
+                .result("Review deleted successfully")
+                .build();
     }
 }

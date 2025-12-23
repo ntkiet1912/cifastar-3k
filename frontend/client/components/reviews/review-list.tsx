@@ -97,7 +97,8 @@ function ReviewCard({
 
   const hasVotedHelpful = userVote === "HELPFUL";
   const hasVotedUnhelpful = userVote === "UNHELPFUL";
-  const canVote = !!customerId;
+  const isOwnReview = customerId === review.customer.id;
+  const canVote = !!customerId && !isOwnReview;
 
   const handleHelpful = () => {
     if (canVote && customerId) {
@@ -152,7 +153,9 @@ function ReviewCard({
           onClick={handleHelpful}
           disabled={!canVote}
           className={`flex items-center gap-2 ${
-            hasVotedHelpful
+            !canVote
+              ? "text-gray-400 cursor-not-allowed hover:text-gray-400 hover:bg-transparent"
+              : hasVotedHelpful
               ? "bg-green-600 text-white hover:bg-green-700"
               : "text-gray-600 hover:text-green-600"
           }`}
@@ -167,7 +170,9 @@ function ReviewCard({
           onClick={handleUnhelpful}
           disabled={!canVote}
           className={`flex items-center gap-2 ${
-            hasVotedUnhelpful
+            !canVote
+              ? "text-gray-400 cursor-not-allowed hover:text-gray-400 hover:bg-transparent"
+              : hasVotedUnhelpful
               ? "bg-red-600 text-white hover:bg-red-700"
               : "text-gray-600 hover:text-red-600"
           }`}

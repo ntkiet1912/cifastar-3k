@@ -43,7 +43,8 @@ public interface MovieReviewRepository extends JpaRepository<MovieReview, String
     Long getReviewCountByMovieId(@Param("movieId") String movieId);
 
     // Get reviews by rating range
-    @Query("SELECT r FROM MovieReview r WHERE r.movie.id = :movieId AND r.rating >= :minRating AND r.rating <= :maxRating")
+    @Query(
+            "SELECT r FROM MovieReview r WHERE r.movie.id = :movieId AND r.rating >= :minRating AND r.rating <= :maxRating")
     List<MovieReview> findByMovieIdAndRatingBetween(
             @Param("movieId") String movieId,
             @Param("minRating") BigDecimal minRating,
@@ -60,11 +61,11 @@ public interface MovieReviewRepository extends JpaRepository<MovieReview, String
     // Get rating distribution for a movie
     @Query(
             """
-        SELECT r.rating as rating, COUNT(r) as count
-        FROM MovieReview r
-        WHERE r.movie.id = :movieId
-        GROUP BY r.rating
-        ORDER BY r.rating DESC
-    """)
+		SELECT r.rating as rating, COUNT(r) as count
+		FROM MovieReview r
+		WHERE r.movie.id = :movieId
+		GROUP BY r.rating
+		ORDER BY r.rating DESC
+	""")
     List<Object[]> getRatingDistributionByMovieId(@Param("movieId") String movieId);
 }
