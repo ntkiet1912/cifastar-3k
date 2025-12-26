@@ -14,7 +14,6 @@ import {
   DoorOpen,
   MessageSquare,
   Image,
-  MessageSquare,
 } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 import { PERMISSIONS } from "@/constants/permissions";
