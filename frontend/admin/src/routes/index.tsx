@@ -24,6 +24,8 @@ import { PERMISSIONS } from "@/constants/permissions";
 import { ROUTES } from "@/constants/routes";
 import { Navigate } from "react-router-dom";
 import { TicketBookingPage } from "@/pages/TicketBooking/TickKetBookingPage";
+import MediaLibrary from "@/pages/Medias/MediaLibrary";
+import { ChatbotConfig } from "@/pages/ChatbotConfig";
 
 export const routes = [
   {
@@ -288,6 +290,14 @@ export const routes = [
                 element: <ReviewList />,
               },
             ],
+          },
+          {
+            path: `${ROUTES.MEDIA}`,
+            element: <MediaLibrary />,
+          },
+          {
+            path: `${ROUTES.CHATBOT_CONFIG}`,
+            element: <ChatbotConfig />,
           },
           {
             path: `${ROUTES.TICKET_BOOKING}`,
