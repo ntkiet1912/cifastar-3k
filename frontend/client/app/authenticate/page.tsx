@@ -1,7 +1,7 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { setToken } from "@/services/localStorageService";
+import { setToken, setUserInfo } from "@/services/localStorageService";
 import { useAuthStore } from "@/store";
 import { getMyInfo } from "@/services/customerService";
 import { createPassword } from "@/services/authService";
@@ -32,22 +32,18 @@ export default function Authenticate() {
         })
         .then(async (data) => {
           setToken(data.result?.token);
-          login(); // Cập nhật auth store để Header re-render
+          login();
 
-          // Fetch user info to check noPassword
           try {
             const userInfo = await getMyInfo();
-
+            setUserInfo(userInfo);
             if (userInfo.noPassword === true) {
-              // Show create password modal
               setShowCreatePassword(true);
             } else {
-              // Redirect to home if password already exists
               setIsLoggedin(true);
             }
           } catch (error) {
             console.error("Failed to fetch user info:", error);
-            // Still redirect to home on error
             setIsLoggedin(true);
           }
         })
@@ -78,7 +74,6 @@ export default function Authenticate() {
   };
 
   const handleCloseModal = () => {
-    // Allow user to skip and still redirect to home
     setShowCreatePassword(false);
     setIsLoggedin(true);
   };

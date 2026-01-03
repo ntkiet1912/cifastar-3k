@@ -52,7 +52,7 @@ export function ReviewsSection({ movieId, customerId: customerIdProp, movieStatu
           // Method 2: If not found, fetch from API
           if (!userId) {
             const customerInfo = await getMyInfo();
-            userId = customerInfo.customerId || customerInfo.id;
+            userId = customerInfo.id;
           }
 
           if (userId) {
