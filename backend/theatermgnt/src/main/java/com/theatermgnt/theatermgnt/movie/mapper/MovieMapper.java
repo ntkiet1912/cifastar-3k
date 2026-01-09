@@ -36,4 +36,6 @@ public interface MovieMapper {
     MovieResponse.AgeRatingInfo toAgeRatingInfo(AgeRating ageRating);
 
     MovieResponse.GenreInfo toGenreInfo(Genre genre);
+
+    MovieSimpleResponse.GenreInfo toSimpleGenreInfo(Genre genre);
 }

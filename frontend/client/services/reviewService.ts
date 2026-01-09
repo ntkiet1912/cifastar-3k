@@ -10,7 +10,6 @@ import type {
 
 const BASE_URL = "/reviews";
 
-// ============ CREATE ============
 export const createReview = async (
   request: CreateReviewRequest
 ): Promise<MovieReview> => {
@@ -18,15 +17,14 @@ export const createReview = async (
     BASE_URL,
     request
   );
-  return response.data.result;
+  return response.data.result!;
 };
 
-// ============ READ ============
 export const getReviewById = async (reviewId: string): Promise<MovieReview> => {
   const response = await httpClient.get<ApiResponse<MovieReview>>(
     `${BASE_URL}/${reviewId}`
   );
-  return response.data.result;
+  return response.data.result!;
 };
 
 export const getReviewsByMovieId = async (
@@ -35,7 +33,7 @@ export const getReviewsByMovieId = async (
   const response = await httpClient.get<ApiResponse<MovieReview[]>>(
     `${BASE_URL}/movie/${movieId}`
   );
-  return response.data.result;
+  return response.data.result!;
 };
 
 export const getReviewsByMovieIdPaginated = async (
@@ -49,7 +47,7 @@ export const getReviewsByMovieIdPaginated = async (
       params: { page, size },
     }
   );
-  return response.data.result;
+  return response.data.result!;
 };
 
 export const getMostHelpfulReviews = async (
@@ -63,7 +61,7 @@ export const getMostHelpfulReviews = async (
       params: { page, size },
     }
   );
-  return response.data.result;
+  return response.data.result!;
 };
 
 export const getRecentReviews = async (
@@ -77,7 +75,7 @@ export const getRecentReviews = async (
       params: { page, size },
     }
   );
-  return response.data.result;
+  return response.data.result!;
 };
 
 export const getReviewsByCustomerId = async (
@@ -86,7 +84,7 @@ export const getReviewsByCustomerId = async (
   const response = await httpClient.get<ApiResponse<MovieReview[]>>(
     `${BASE_URL}/customer/${customerId}`
   );
-  return response.data.result;
+  return response.data.result!;
 };
 
 export const getMovieRatingStats = async (
@@ -95,10 +93,9 @@ export const getMovieRatingStats = async (
   const response = await httpClient.get<ApiResponse<MovieRatingStats>>(
     `${BASE_URL}/movie/${movieId}/stats`
   );
-  return response.data.result;
+  return response.data.result!;
 };
 
-// ============ UPDATE ============
 export const updateReview = async (
   reviewId: string,
   request: UpdateReviewRequest
@@ -107,7 +104,7 @@ export const updateReview = async (
     `${BASE_URL}/${reviewId}`,
     request
   );
-  return response.data.result;
+  return response.data.result!;
 };
 
 export const markReviewAsHelpful = async (
@@ -117,7 +114,7 @@ export const markReviewAsHelpful = async (
   const response = await httpClient.patch<ApiResponse<MovieReview>>(
     `${BASE_URL}/${reviewId}/helpful?customerId=${customerId}`
   );
-  return response.data.result;
+  return response.data.result!;
 };
 
 export const markReviewAsUnhelpful = async (
@@ -127,7 +124,7 @@ export const markReviewAsUnhelpful = async (
   const response = await httpClient.patch<ApiResponse<MovieReview>>(
     `${BASE_URL}/${reviewId}/unhelpful?customerId=${customerId}`
   );
-  return response.data.result;
+  return response.data.result!;
 };
 
 export const getUserVotes = async (
@@ -138,15 +135,13 @@ export const getUserVotes = async (
     return {};
   }
 
-  // Build query params manually for better control
   const reviewIdsParam = reviewIds.map(id => `reviewIds=${id}`).join('&');
   const response = await httpClient.get<ApiResponse<Record<string, string>>>(
     `${BASE_URL}/votes?customerId=${customerId}&${reviewIdsParam}`
   );
-  return response.data.result as Record<string, "HELPFUL" | "UNHELPFUL">;
+  return response.data.result! as Record<string, "HELPFUL" | "UNHELPFUL">;
 };
 
-// ============ DELETE ============
 export const deleteReview = async (reviewId: string): Promise<void> => {
   await httpClient.delete(`${BASE_URL}/${reviewId}`);
 };
