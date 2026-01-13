@@ -1,8 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Calendar, Film, Clock } from "lucide-react";
+import { Pencil, Trash2, Calendar, Film, Clock, AlertTriangle } from "lucide-react";
 import type { MovieSimple } from "@/types/MovieType/Movie";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
 
 interface MovieTableProps {
   movies: MovieSimple[];
@@ -113,10 +118,22 @@ export function MovieTable({
 
                 {/* Title */}
                 <td className="p-3">
-                  <div className="space-y-1">
+                  <div className="flex items-center gap-2">
                     <p className="font-medium text-foreground line-clamp-2">
                       {movie.title}
                     </p>
+                    {movie.needsArchiveWarning && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900/30 flex-shrink-0">
+                            <AlertTriangle className="w-3 h-3 text-amber-700 dark:text-amber-400" />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>No screenings in the next 7 days. Consider archiving.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
                   </div>
                 </td>
 

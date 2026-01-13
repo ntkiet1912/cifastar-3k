@@ -28,6 +28,7 @@ public class MovieSimpleResponse {
     String ageRatingCode;
     String director;
     Set<GenreInfo> genres;
+    Boolean needsArchiveWarning;
 
     @Data
     @Builder

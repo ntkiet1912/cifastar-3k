@@ -1,5 +1,6 @@
 package com.theatermgnt.theatermgnt.movie.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,6 +22,8 @@ import com.theatermgnt.theatermgnt.movie.mapper.MovieMapper;
 import com.theatermgnt.theatermgnt.movie.repository.AgeRatingRepository;
 import com.theatermgnt.theatermgnt.movie.repository.GenreRepository;
 import com.theatermgnt.theatermgnt.movie.repository.MovieRepository;
+import com.theatermgnt.theatermgnt.screening.enums.ScreeningStatus;
+import com.theatermgnt.theatermgnt.screening.repository.ScreeningRepository;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +40,7 @@ public class MovieService {
     AgeRatingRepository ageRatingRepository;
     GenreRepository genreRepository;
     MovieMapper movieMapper;
+    ScreeningRepository screeningRepository;
 
     // ========== CREATE ==========
     public MovieResponse createMovie(CreateMovieRequest request) {
@@ -78,7 +82,13 @@ public class MovieService {
     // ========== READ ==========
     public List<MovieSimpleResponse> getAllMovies() {
         List<Movie> movies = movieRepository.findAllWithGenres();
-        return movies.stream().map(movieMapper::toMovieSimpleResponse).collect(Collectors.toList());
+        return movies.stream()
+                .map(movie -> {
+                    MovieSimpleResponse response = movieMapper.toMovieSimpleResponse(movie);
+                    response.setNeedsArchiveWarning(shouldShowArchiveWarning(movie));
+                    return response;
+                })
+                .collect(Collectors.toList());
     }
 
     public MovieResponse getMovieById(String id) {
@@ -125,6 +135,11 @@ public class MovieService {
     public MovieResponse updateMovie(String id, UpdateMovieRequest request) {
         Movie movie = movieRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.MOVIE_NOT_EXISTED));
 
+        if (request.getStatus() == MovieStatus.archived
+                && screeningRepository.existsByMovieIdAndStatus(id, ScreeningStatus.SCHEDULED)) {
+            throw new AppException(ErrorCode.MOVIE_HAS_SCHEDULED_SCREENINGS);
+        }
+
         // Update basic fields using MapStruct
         movieMapper.updateMovieFromRequest(request, movie);
 
@@ -152,9 +167,26 @@ public class MovieService {
 
     public MovieResponse archiveMovie(String id) {
         Movie movie = movieRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.MOVIE_NOT_EXISTED));
+
+        if (screeningRepository.existsByMovieIdAndStatus(id, ScreeningStatus.SCHEDULED)) {
+            throw new AppException(ErrorCode.MOVIE_HAS_SCHEDULED_SCREENINGS);
+        }
+
         movie.setStatus(MovieStatus.archived);
         Movie archivedMovie = movieRepository.save(movie);
         return movieMapper.toMovieResponse(archivedMovie);
+    }
+
+    private boolean shouldShowArchiveWarning(Movie movie) {
+        if (movie.getStatus() != MovieStatus.now_showing) {
+            return false;
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime sevenDaysLater = now.plusDays(7);
+
+        return !screeningRepository.existsByMovieIdAndStartTimeBetween(
+                movie.getId(), now, sevenDaysLater);
     }
 
     // ========== DELETE ==========
