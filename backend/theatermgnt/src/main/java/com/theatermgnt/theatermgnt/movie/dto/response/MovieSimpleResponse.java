@@ -9,6 +9,10 @@ import com.theatermgnt.theatermgnt.common.enums.MovieStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * Response đơn giản cho danh sách phim
+ * Chỉ chứa thông tin cần thiết để hiển thị trong list/card view
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -19,6 +23,9 @@ public class MovieSimpleResponse {
     String id;
     String title;
     String posterUrl;
+    String trailerUrl;
+
+
     Integer durationMinutes;
 
     @JsonFormat(pattern = "yyyy-MM-dd")

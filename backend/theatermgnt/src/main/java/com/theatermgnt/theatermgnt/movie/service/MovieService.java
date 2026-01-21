@@ -3,9 +3,9 @@ package com.theatermgnt.theatermgnt.movie.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.theatermgnt.theatermgnt.common.enums.MovieStatus;
@@ -44,39 +44,26 @@ public class MovieService {
 
     // ========== CREATE ==========
     public MovieResponse createMovie(CreateMovieRequest request) {
-        log.info("Creating movie with title: {}", request.getTitle());
+        // Validate AgeRating exists
+        AgeRating ageRating = ageRatingRepository
+                .findById(request.getAgeRatingId())
+                .orElseThrow(() -> new AppException(ErrorCode.AGERATING_NOT_EXISTED));
 
-        try {
-            // Validate AgeRating exists
-            AgeRating ageRating = ageRatingRepository
-                    .findById(request.getAgeRatingId())
-                    .orElseThrow(() -> new AppException(ErrorCode.AGERATING_NOT_EXISTED));
+        // Validate Genres exist
+        Set<Genre> genres = request.getGenreIds().stream()
+                .map(id ->
+                        genreRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.GENRE_NOT_EXISTED)))
+                .collect(Collectors.toSet());
 
-            // Validate Genres exist
-            Set<Genre> genres = request.getGenreIds().stream()
-                    .map(id -> genreRepository
-                            .findById(id)
-                            .orElseThrow(() -> new AppException(ErrorCode.GENRE_NOT_EXISTED)))
-                    .collect(Collectors.toSet());
+        // Map and set relationships
+        Movie movie = movieMapper.toMovie(request);
+        movie.setAgeRating(ageRating);
+        movie.setGenres(genres);
 
-            // Map and set relationships
-            Movie movie = movieMapper.toMovie(request);
-            // Don't set ID manually - let JPA generate it with @GeneratedValue
-            movie.setAgeRating(ageRating);
-            movie.setGenres(genres);
-
-            // Save and return response
-            Movie savedMovie = movieRepository.save(movie);
-            log.info("Successfully created movie with id: {}", savedMovie.getId());
-
-            return movieMapper.toMovieResponse(savedMovie);
-        } catch (AppException e) {
-            log.error("AppException while creating movie: {}", e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error while creating movie: {}", e.getMessage(), e);
-            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
-        }
+        // Save and return response
+        Movie savedMovie = movieRepository.save(movie);
+        log.info("Created movie with id: {}", savedMovie.getId());
+        return movieMapper.toMovieResponse(savedMovie);
     }
 
     // ========== READ ==========
@@ -139,7 +126,6 @@ public class MovieService {
                 && screeningRepository.existsByMovieIdAndStatus(id, ScreeningStatus.SCHEDULED)) {
             throw new AppException(ErrorCode.MOVIE_HAS_SCHEDULED_SCREENINGS);
         }
-
         // Update basic fields using MapStruct
         movieMapper.updateMovieFromRequest(request, movie);
 
@@ -162,6 +148,7 @@ public class MovieService {
         }
 
         Movie updatedMovie = movieRepository.save(movie);
+        log.info("Updated movie with id: {}", updatedMovie.getId());
         return movieMapper.toMovieResponse(updatedMovie);
     }
 
@@ -174,6 +161,7 @@ public class MovieService {
 
         movie.setStatus(MovieStatus.archived);
         Movie archivedMovie = movieRepository.save(movie);
+        log.info("Archived movie with id: {}", archivedMovie.getId());
         return movieMapper.toMovieResponse(archivedMovie);
     }
 
@@ -191,26 +179,10 @@ public class MovieService {
 
     // ========== DELETE ==========
     public void deleteMovie(String movieId) {
-        try {
-            Movie movie =
-                    movieRepository.findById(movieId).orElseThrow(() -> new AppException(ErrorCode.MOVIE_NOT_EXISTED));
-
-            // Clear ManyToMany relationships before deleting to avoid issues
-            if (movie.getGenres() != null && !movie.getGenres().isEmpty()) {
-                movie.getGenres().clear();
-                movieRepository.save(movie);
-            }
-
-            // Soft delete via @SQLDelete in BaseEntity
-            movieRepository.delete(movie);
-        } catch (DataIntegrityViolationException e) {
-            log.error("DataIntegrityViolationException while deleting movie {}: {}", movieId, e.getMessage());
-            throw new AppException(ErrorCode.MOVIE_IN_USE);
-        } catch (AppException e) {
-            throw e;
-        } catch (Exception e) {
-            log.error("Unexpected error while deleting movie {}: {}", movieId, e.getMessage(), e);
-            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
-        }
+        Movie movie =
+                movieRepository.findById(movieId).orElseThrow(() -> new AppException(ErrorCode.MOVIE_NOT_EXISTED));
+        movieRepository.delete(movie);
+        log.info("Deleted movie with id: {}", movieId);
     }
+
 }

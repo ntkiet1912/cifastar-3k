@@ -1,8 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Calendar, Film, Clock, AlertTriangle } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  Calendar,
+  Film,
+  Clock,
+  AlertTriangle,
+} from "lucide-react";
 import type { MovieSimple } from "@/types/MovieType/Movie";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+
 import {
   Tooltip,
   TooltipTrigger,
@@ -24,7 +32,8 @@ const statusLabels = {
 };
 
 const statusColors = {
-  now_showing: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+  now_showing:
+    "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
   coming_soon: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
   archived: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300",
 };
@@ -98,7 +107,7 @@ export function MovieTable({
                 key={movie.id}
                 className={cn(
                   "border-b border-border hover:bg-accent/50 transition-colors",
-                  index === movies.length - 1 && "border-b-0"
+                  index === movies.length - 1 && "border-b-0",
                 )}
               >
                 {/* Poster */}
@@ -110,7 +119,8 @@ export function MovieTable({
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='64' viewBox='0 0 48 64'%3E%3Crect width='48' height='64' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-family='Arial' font-size='12'%3ENo Image%3C/text%3E%3C/svg%3E";
+                        target.src =
+                          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='64' viewBox='0 0 48 64'%3E%3Crect width='48' height='64' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-family='Arial' font-size='12'%3ENo Image%3C/text%3E%3C/svg%3E";
                       }}
                     />
                   </div>
@@ -130,7 +140,10 @@ export function MovieTable({
                           </span>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>No screenings in the next 7 days. Consider archiving.</p>
+                          <p>
+                            No screenings in the next 7 days. Consider
+                            archiving.
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     )}
@@ -172,7 +185,7 @@ export function MovieTable({
                   <span
                     className={cn(
                       "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium",
-                      statusColors[movie.status]
+                      statusColors[movie.status],
                     )}
                   >
                     {statusLabels[movie.status]}
