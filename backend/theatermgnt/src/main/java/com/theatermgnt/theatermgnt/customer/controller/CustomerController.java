@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.theatermgnt.theatermgnt.common.dto.response.ApiResponse;
 import com.theatermgnt.theatermgnt.customer.dto.request.CustomerProfileUpdateRequest;
+import com.theatermgnt.theatermgnt.customer.dto.response.CustomerLoyaltyPointsResponse;
 import com.theatermgnt.theatermgnt.customer.dto.response.CustomerResponse;
 import com.theatermgnt.theatermgnt.customer.service.CustomerService;
 

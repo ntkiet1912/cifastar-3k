@@ -1,4 +1,7 @@
 import axios from 'axios'
+import { clearAuthData } from '@/services/localStorageService'
+import { requestTokenRefresh } from "@/services/tokenRefresh";
+import { useAuthStore } from '@/store'
 
 
 const API_BASE_URL = 'http://localhost:8080/api/theater-mgnt'
@@ -11,6 +14,37 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 })
+
+const PUBLIC_API_PATHS = [
+  "/movies",
+  "/genres",
+  "/screenings",
+  "/cinemas",
+  "/reviews",
+  "/payment",
+];
+
+const isPublicRequest = (url?: string) => {
+  if (!url) {
+    return false;
+  }
+  const path = url.startsWith("http") ? new URL(url).pathname : url;
+  return PUBLIC_API_PATHS.some((publicPath) => path.startsWith(publicPath));
+};
+
+const handleAuthFailure = () => {
+  if (typeof window === "undefined") {
+    return;
+  }
+  clearAuthData();
+  useAuthStore.getState().logout();
+};
+
+const isRefreshRequest = (url?: string) => {
+  if (!url) return false;
+  const path = url.startsWith("http") ? new URL(url).pathname : url;
+  return path.startsWith("/auth/refresh");
+};
 
 
 api.interceptors.request.use(
@@ -39,8 +73,37 @@ api.interceptors.response.use(
     }
     return response
   },
-  (error) => {
-    console.error('API Error:', error.response?.data || error.message)
+  async (error) => {
+    const status = error?.response?.status;
+    const code = error?.response?.data?.code;
+    const url = error?.config?.url;
+    const originalRequest = error?.config;
+    const isCancelBookingRequest =
+      typeof url === "string" &&
+      url.includes("/bookings/") &&
+      url.endsWith("/cancel");
+    if (status === 401 || code === 1006) {
+      if (
+        originalRequest &&
+        !originalRequest._retry &&
+        !isRefreshRequest(originalRequest.url) &&
+        !isPublicRequest(originalRequest.url)
+      ) {
+        originalRequest._retry = true;
+        const refreshedToken = await requestTokenRefresh();
+        if (refreshedToken && originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${refreshedToken}`;
+          return api(originalRequest);
+        }
+      }
+      handleAuthFailure();
+    }
+    if (
+      status !== 401 &&
+      !(isCancelBookingRequest && (status === 400 || status === 404))
+    ) {
+      console.error('API Error:', error.response?.data || error.message)
+    }
     return Promise.reject(error)
   }
 )
