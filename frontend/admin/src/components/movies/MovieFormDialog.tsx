@@ -26,7 +26,7 @@ export function MovieFormDialog({
     description: "",
     durationMinutes: 90,
     director: "",
-    cast: "",
+    castMembers: "",
     posterUrl: "",
     trailerUrl: "",
     releaseDate: "",
@@ -68,7 +68,7 @@ export function MovieFormDialog({
         description: movie.description,
         durationMinutes: movie.durationMinutes,
         director: movie.director,
-        cast: movie.cast,
+        castMembers: movie.castMembers,
         posterUrl: movie.posterUrl,
         trailerUrl: movie.trailerUrl,
         releaseDate: movie.releaseDate,
@@ -83,7 +83,7 @@ export function MovieFormDialog({
         description: "",
         durationMinutes: 90,
         director: "",
-        cast: "",
+        castMembers: "",
         posterUrl: "",
         trailerUrl: "",
         releaseDate: "",
@@ -123,10 +123,10 @@ export function MovieFormDialog({
       newErrors.director = "Director must not exceed 255 characters";
     }
 
-    if (!formData.cast || !formData.cast.trim()) {
-      newErrors.cast = "Cast is required";
-    } else if (formData.cast.length > 2000) {
-      newErrors.cast = "Cast must not exceed 2000 characters";
+    if (!formData.castMembers || !formData.castMembers.trim()) {
+      newErrors.castMembers = "Cast is required";
+    } else if (formData.castMembers.length > 2000) {
+      newErrors.castMembers = "Cast must not exceed 2000 characters";
     }
 
     // URL validation - must start with http:// or https://
@@ -355,15 +355,17 @@ export function MovieFormDialog({
           </label>
           <Input
             type="text"
-            name="cast"
-            value={formData.cast}
+            name="castMembers"
+            value={formData.castMembers}
             onChange={handleChange}
             placeholder="Actor 1, Actor 2, Actor 3"
             disabled={saving}
-            className={errors.cast ? "border-destructive" : ""}
+            className={errors.castMembers ? "border-destructive" : ""}
           />
-          {errors.cast && (
-            <p className="text-xs text-destructive mt-1">{errors.cast}</p>
+          {errors.castMembers && (
+            <p className="text-xs text-destructive mt-1">
+              {errors.castMembers}
+            </p>
           )}
         </div>
 

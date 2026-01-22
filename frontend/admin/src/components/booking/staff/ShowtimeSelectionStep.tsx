@@ -2,11 +2,11 @@ import { Clock, MapPin } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { format } from "date-fns"
 import { useEffect, useMemo, useState } from "react"
-import type { Movie } from "@/services/movieService"
+import type { MovieSimple } from "@/types/MovieType/Movie"
 import type { ShowtimeResponse } from "@/services/showtimeService"
 
 interface ShowtimeSelectionStepProps {
-  movie: Movie
+  movie: MovieSimple & { description?: string }
   showtimes: ShowtimeResponse[]
   loading: boolean
   onSelectShowtime: (showtime: ShowtimeResponse) => void

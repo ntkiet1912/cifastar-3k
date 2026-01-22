@@ -24,7 +24,6 @@ import { useConfirmDialog } from "@/hooks/useConfirmDialog";
 import { Search, Eye, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { cn } from "@/lib/utils";
 
 const channelConfig = {
   EMAIL: {

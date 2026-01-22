@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { usePermissions } from "@/hooks/usePermissions";
 import { PERMISSIONS } from "@/constants/permissions";
-import { useAuthStore } from "@/stores";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useTodayRevenue } from "@/hooks/useTodayRevenue";
 import { useTodayShowtimes } from "@/hooks/useTodayShowtimes";
@@ -13,8 +12,6 @@ import {
   TrendingUp,
   Clock,
   BarChart3,
-  CheckCircle,
-  AlertCircle,
   Ticket,
   ChartColumn,
   UserCog,
@@ -39,8 +36,8 @@ export function DashboardOverview() {
   const navigate = useNavigate();
   const { hasPermission } = usePermissions();
   const { stats, loading: statsLoading } = useDashboardStats();
-  const { data: revenueData, loading: revenueLoading } = useTodayRevenue();
-  const { showtimes, loading: showtimesLoading } = useTodayShowtimes();
+  const { data: revenueData } = useTodayRevenue();
+  const { showtimes } = useTodayShowtimes();
 
   // Get current date and time
   const now = new Date();

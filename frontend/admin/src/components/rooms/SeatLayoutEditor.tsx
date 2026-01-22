@@ -1,13 +1,5 @@
 import type { SeatType, SeatLayout } from "@/types/SeatType/seat";
-import {
-  ArrowLeft,
-  Plus,
-  Sofa,
-  Crown,
-  Heart,
-  Trash2,
-  Check,
-} from "lucide-react";
+import { Sofa, Crown, Heart, Check } from "lucide-react";
 import { Label } from "../ui";
 import { getRowLetter } from "@/utils/seatUtils";
 import { Button } from "../ui/button";

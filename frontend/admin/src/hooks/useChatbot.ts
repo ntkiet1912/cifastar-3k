@@ -26,8 +26,7 @@ export function useChatbot() {
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { confirmDialog, showConfirmDialog, closeConfirmDialog } =
-    useConfirmDialog();
+  const { confirmDialog, closeConfirmDialog } = useConfirmDialog();
 
   // Scroll to bottom
   const scrollToBottom = useCallback(() => {

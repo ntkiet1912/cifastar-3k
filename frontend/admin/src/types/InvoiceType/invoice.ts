@@ -1,10 +1,13 @@
-// Invoice Status Enum
-export enum InvoiceStatus {
-  PENDING = "PENDING",
-  PAID = "PAID",
-  FAILED = "FAILED",
-  REFUNDED = "REFUNDED",
-}
+// Invoice Status Values
+export const InvoiceStatus = {
+  PENDING: "PENDING",
+  PAID: "PAID",
+  FAILED: "FAILED",
+  REFUNDED: "REFUNDED",
+} as const;
+
+export type InvoiceStatus =
+  (typeof InvoiceStatus)[keyof typeof InvoiceStatus];
 
 // Base Invoice Response
 export interface InvoiceResponse {

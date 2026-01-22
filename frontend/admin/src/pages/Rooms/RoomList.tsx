@@ -1,4 +1,4 @@
-import { RoomCard, AddRoomButton } from "@/components/rooms";
+import { RoomCard } from "@/components/rooms";
 import { useRoomManager } from "@/hooks/useRoomManager";
 import type { Room } from "@/types/RoomType/room";
 import { useEffect, useState, useMemo } from "react";

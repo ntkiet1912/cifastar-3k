@@ -31,7 +31,6 @@ export default function SeatSelectionStep({
   onCheckoutModeChange,
 }: SeatSelectionStepProps) {
   const [groupedByRow, setGroupedByRow] = useState<Record<string, Seat[]>>({})
-  const [customerPhone, setCustomerPhone] = useState("")
 
   const isGuestCheckout = checkoutMode === "guest"
 

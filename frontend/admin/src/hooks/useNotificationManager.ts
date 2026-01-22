@@ -44,8 +44,8 @@ export function useNotificationManager() {
     async (request: NotificationRequest): Promise<boolean> => {
       try {
         setSending(true);
-        const newNotification = await sendNotification(request);
-        setNotifications((prev) => [newNotification, ...prev]);
+        const newNotifications = await sendNotification(request);
+        setNotifications((prev) => [...newNotifications, ...prev]);
         addNotification({
           type: "success",
           title: "Success",

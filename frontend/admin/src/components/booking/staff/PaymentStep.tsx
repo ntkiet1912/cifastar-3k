@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { CheckCircle2, Loader2, Smartphone, Wallet } from "lucide-react"
 import { format } from "date-fns"
 import type { Seat, ComboItem, Showtime } from "../../../lib/types"
-import type { Movie } from "@/services/movieService"
+import type { MovieSimple } from "@/types/MovieType/Movie"
 import httpClient from "@/configurations/httpClient"
 
 interface PaymentStepProps {
@@ -13,7 +13,7 @@ interface PaymentStepProps {
   subtotal: number
   discount: number
   showtime: Showtime & { roomName: string; cinemaName: string }
-  movie: Movie
+  movie: MovieSimple & { description?: string }
   selectedSeats: Seat[]
   selectedCombos: ComboItem[]
   onPaymentSuccess: () => void

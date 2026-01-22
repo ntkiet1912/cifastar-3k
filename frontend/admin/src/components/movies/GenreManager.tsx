@@ -20,7 +20,6 @@ export function GenreManager({ isOpen, onClose, onUpdate }: GenreManagerProps) {
   const [activeTab, setActiveTab] = useState<TabType>("genres");
   const [genres, setGenres] = useState<Genre[]>([]);
   const [ageRatings, setAgeRatings] = useState<AgeRating[]>([]);
-  const [loading, setLoading] = useState(false);
 
   // New item states
   const [newGenre, setNewGenre] = useState({ name: "" });
@@ -51,7 +50,6 @@ export function GenreManager({ isOpen, onClose, onUpdate }: GenreManagerProps) {
 
   const loadData = async () => {
     try {
-      setLoading(true);
       const [genresData, ratingsData] = await Promise.all([
         getAllGenres(),
         getAllAgeRatings(),
@@ -64,8 +62,6 @@ export function GenreManager({ isOpen, onClose, onUpdate }: GenreManagerProps) {
         title: "Error",
         message: "Failed to load data",
       });
-    } finally {
-      setLoading(false);
     }
   };
 

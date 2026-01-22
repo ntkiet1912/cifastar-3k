@@ -1,14 +1,14 @@
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import type { Seat, ComboItem, Showtime } from "../../../lib/types"
-import type { Movie } from "@/services/movieService"
+import type { MovieSimple } from "@/types/MovieType/Movie"
 import { format } from "date-fns"
 
 interface ConfirmationStepProps {
   selectedSeats: Seat[]
   selectedCombos: ComboItem[]
   showtime: Showtime & { roomName: string; cinemaName: string }
-  movie: Movie
+  movie: MovieSimple & { description?: string }
   subtotal: number
   customerPoints: number
   pointsUsed: number

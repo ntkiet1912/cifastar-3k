@@ -155,7 +155,10 @@ export function CinemaFormDialog({
     }
   };
 
-  const handleChange = (field: keyof CreateCinemaRequest, value: string) => {
+  const handleChange = (
+    field: keyof CreateCinemaRequest,
+    value: string | undefined
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {

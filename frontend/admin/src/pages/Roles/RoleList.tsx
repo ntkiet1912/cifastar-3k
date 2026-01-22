@@ -15,8 +15,6 @@ import {
   Pencil,
   Trash2,
   Shield,
-  Search,
-  X,
   ShieldCheck,
 } from "lucide-react";
 

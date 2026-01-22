@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, ChevronLeft, ChevronRight, Eye } from "lucide-react"
@@ -56,7 +56,7 @@ export default function SuccessStep({
 
       // Generate QR codes for all tickets
       const qrPromises = fetchedTickets.map((ticket) =>
-        QRCode.toDataURL(ticket.qrContent || ticket.ticketCode, {
+        QRCode.toDataURL(ticket.qrContent || ticket.ticketCode || "", {
           width: 300,
           margin: 2,
           color: {
@@ -108,14 +108,14 @@ export default function SuccessStep({
 
     // Company Name - cifastar (top left)
     pdf.setFontSize(14)
-    pdf.setFont(undefined, "bold")
+    pdf.setFont("helvetica", "bold")
     pdf.setTextColor(147, 51, 234)
     pdf.text("Cifastar", margin + 5, yPosition + 3)
     yPosition += 10
 
     // Header - Movie Title (centered)
     pdf.setFontSize(18)
-    pdf.setFont(undefined, "bold")
+    pdf.setFont("helvetica", "bold")
     pdf.setTextColor(147, 51, 234)
     const movieTitle = movie?.title || "MOVIE TICKET"
     pdf.text(movieTitle, pageWidth / 2, yPosition, { align: "center", maxWidth: contentWidth - 4 })
@@ -153,7 +153,7 @@ export default function SuccessStep({
 
     // Ticket Details Section
     pdf.setFontSize(11)
-    pdf.setFont(undefined, "normal")
+    pdf.setFont("helvetica", "normal")
     pdf.setTextColor(0, 0, 0)
 
     const labelX = margin + 6
@@ -165,7 +165,7 @@ export default function SuccessStep({
     pdf.setFillColor(240, 230, 255)
     pdf.rect(margin + 3, yPosition - 1, contentWidth - 6, lineHeight + boxPadding * 2, "F")
 
-    pdf.setFont(undefined, "bold")
+    pdf.setFont("helvetica", "bold")
     pdf.setTextColor(147, 51, 234)
     pdf.setFontSize(12)
     pdf.text("SEAT", labelX, yPosition + boxPadding + 3)
@@ -174,8 +174,8 @@ export default function SuccessStep({
     yPosition += lineHeight + boxPadding * 2 + 2
 
     // Details rows
-    const details = [
-      { label: "Ticket Code:", value: ticket.ticketCode },
+    const details: Array<{ label: string; value: string }> = [
+      { label: "Ticket Code:", value: ticket.ticketCode || "N/A" },
       { label: "Showtime:", value: showtime?.time || "N/A" },
       { label: "Format:", value: showtime?.format || "N/A" },
       { label: "Price:", value: `${ticket.price.toLocaleString()} VND` },
@@ -189,11 +189,11 @@ export default function SuccessStep({
         pdf.rect(margin + 3, yPosition - 2, contentWidth - 6, lineHeight + 2, "F")
       }
 
-      pdf.setFont(undefined, "bold")
+      pdf.setFont("helvetica", "bold")
       pdf.setTextColor(147, 51, 234)
       pdf.text(detail.label, labelX, yPosition + 2)
 
-      pdf.setFont(undefined, "normal")
+      pdf.setFont("helvetica", "normal")
       pdf.setTextColor(0, 0, 0)
       pdf.text(detail.value, valueX, yPosition + 2, { maxWidth: 60 })
 
@@ -214,11 +214,11 @@ export default function SuccessStep({
     pdf.rect(margin + 3, yPosition, contentWidth - 6, 16, "FD")
 
     pdf.setFontSize(9)
-    pdf.setFont(undefined, "bold")
+    pdf.setFont("helvetica", "bold")
     pdf.setTextColor(147, 51, 234)
     pdf.text("IMPORTANT:", margin + 6, yPosition + 4)
 
-    pdf.setFont(undefined, "normal")
+    pdf.setFont("helvetica", "normal")
     pdf.setFontSize(8)
     pdf.setTextColor(110, 40, 180)
     pdf.text("Please show this QR code at the entrance", margin + 6, yPosition + 9)
@@ -227,7 +227,7 @@ export default function SuccessStep({
 
     // Footer - Purple accent
     pdf.setFontSize(7)
-    pdf.setFont(undefined, "normal")
+    pdf.setFont("helvetica", "normal")
     pdf.setTextColor(100, 100, 100)
     pdf.text(`Booking ID: ${bookingId}`, pageWidth / 2, pageHeight - margin - 3, { align: "center" })
     pdf.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - margin, { align: "center" })
@@ -249,7 +249,7 @@ export default function SuccessStep({
       })
 
       generateTicketPage(pdf, currentTicket, qrCodeUrls[currentTicketIndex] || null, 0)
-      pdf.save(`ticket-${currentTicket.ticketCode}.pdf`)
+      pdf.save(`ticket-${currentTicket.ticketCode || "ticket"}.pdf`)
     } catch (error) {
       console.error("Error generating PDF:", error)
     }
@@ -268,7 +268,7 @@ export default function SuccessStep({
         })
 
         generateTicketPage(pdf, ticket, qrCodeUrls[index] || null, 0)
-        pdf.save(`ticket-${ticket.ticketCode}.pdf`)
+        pdf.save(`ticket-${ticket.ticketCode || "ticket"}.pdf`)
       })
     } catch (error) {
       console.error("Error generating PDF:", error)

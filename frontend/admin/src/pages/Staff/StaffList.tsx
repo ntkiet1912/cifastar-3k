@@ -8,7 +8,7 @@ import { StaffTable, StaffFormDialog } from "@/components/staff";
 import { useStaffManager } from "@/hooks/useStaffManager";
 import type { StaffProfile } from "@/types/StaffType/StaffProfile";
 import type { StaffRequest } from "@/services/staffService";
-import { Plus, Search, X, Users } from "lucide-react";
+import { Search, X, Users } from "lucide-react";
 
 export const StaffList = () => {
   const [searchQuery, setSearchQuery] = useState("");

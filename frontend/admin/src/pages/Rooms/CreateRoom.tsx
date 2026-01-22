@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,16 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
-import {
-  Activity,
-  Ban,
-  Crown,
-  Heart,
-  Plus,
-  Sofa,
-  Trash2,
-  Wrench,
-} from "lucide-react";
+import { Plus, Sofa, Trash2 } from "lucide-react";
 import { useNotificationStore } from "@/stores";
 import { RoomStatus, RoomType } from "@/types/RoomType/room";
 import { ROUTES } from "@/constants/routes";

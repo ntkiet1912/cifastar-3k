@@ -1,9 +1,16 @@
 import httpClient from "@/configurations/httpClient";
-import type { Movie, MovieSimple, CreateMovieRequest, UpdateMovieRequest } from "@/types/MovieType/Movie";
+import type {
+  Movie,
+  MovieSimple,
+  CreateMovieRequest,
+  UpdateMovieRequest,
+} from "@/types/MovieType/Movie";
 import { handleApiResponse } from "@/utils/apiResponse";
 import type { ApiResponse } from "@/utils/apiResponse";
 
 const BASE_URL = "/movies";
+
+export type { Movie } from "@/types/MovieType/Movie";
 
 export const getAllMovies = async (): Promise<MovieSimple[]> => {
   return handleApiResponse<MovieSimple[]>(

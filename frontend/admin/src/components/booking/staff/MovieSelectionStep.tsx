@@ -2,13 +2,15 @@ import { Film } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { useState, useMemo } from "react"
-import type { Movie } from "@/services/movieService"
+import type { MovieSimple } from "@/types/MovieType/Movie"
+
+type MovieSummary = MovieSimple & { description?: string }
 
 interface MovieSelectionStepProps {
-  movies: Movie[]
+  movies: MovieSummary[]
   loading: boolean
-  onSelectMovie: (movie: Movie) => void
-  selectedMovie: Movie | null
+  onSelectMovie: (movie: MovieSummary) => void
+  selectedMovie: MovieSummary | null
 }
 
 export default function MovieSelectionStep({

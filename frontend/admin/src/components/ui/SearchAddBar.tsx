@@ -11,8 +11,9 @@ interface SearchAddBarProps {
   filteredCount?: number;
   icon?: React.ReactElement<React.SVGProps<SVGSVGElement>>;
   label?: string;
-  buttonText: string;
-  onAddClick: () => void;
+  buttonText?: string;
+  onAddClick?: () => void;
+  showAddButton?: boolean;
   className?: string;
 }
 
@@ -24,8 +25,9 @@ export const SearchAddBar: React.FC<SearchAddBarProps> = ({
   filteredCount,
   icon,
   label,
-  buttonText,
-  onAddClick,
+  buttonText = "Add",
+  onAddClick = () => {},
+  showAddButton = true,
   className = "",
 }) => {
   return (
@@ -76,12 +78,14 @@ export const SearchAddBar: React.FC<SearchAddBarProps> = ({
             </span>
           )}
         </div>
-        <Button onClick={onAddClick} className="gap-2">
-          {icon && React.isValidElement(icon)
-            ? React.cloneElement(icon, { className: "w-4 h-4" })
-            : icon}
-          {buttonText}
-        </Button>
+        {showAddButton && (
+          <Button onClick={onAddClick} className="gap-2">
+            {icon && React.isValidElement(icon)
+              ? React.cloneElement(icon, { className: "w-4 h-4" })
+              : icon}
+            {buttonText}
+          </Button>
+        )}
       </div>
     </div>
   );

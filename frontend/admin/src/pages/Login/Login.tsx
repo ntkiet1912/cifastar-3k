@@ -41,8 +41,7 @@ export function Login() {
     setError("");
 
     try {
-      const response = await login(username, password);
-      // console.log("Login successful:", response);
+      await login(username, password);
 
       addNotification({
         type: "success",

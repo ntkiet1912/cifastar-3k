@@ -36,6 +36,9 @@ export const priorityConfig = {
 
 export const categoryConfig = {
   BOOKING: { label: "Booking", value: "BOOKING" },
+  PROMOTION: { label: "Promotion", value: "PROMOTION" },
+  SECURITY: { label: "Security", value: "SECURITY" },
+  REMINDER: { label: "Reminder", value: "REMINDER" },
   SYSTEM: { label: "System", value: "SYSTEM" },
 } as const;
 

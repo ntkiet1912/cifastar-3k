@@ -65,7 +65,7 @@ export function CreateShowtimeDialog({
       resetForm();
       console.log('CreateShowtimeDialog - cinemaBuffer:', cinemaBuffer);
     }
-  }, [open, cinemaBuffer]);
+  }, [open, cinemaBuffer, cinemaId]);
 
   useEffect(() => {
     if (selectedRoomId) {
