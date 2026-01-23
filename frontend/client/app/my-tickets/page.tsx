@@ -339,7 +339,11 @@ export default function MyTicketsPage() {
                             Purchased
                           </span>
                           <span className="text-right text-slate-600 dark:text-slate-300 text-xs">
-                            {new Date(ticket.createdAt).toLocaleString()}
+                            {ticket.createdAt
+                              ? new Date(ticket.createdAt).toLocaleString()
+                              : new Date(
+                                  ticket.purchaseDate || ticket.startTime,
+                                ).toLocaleString()}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">

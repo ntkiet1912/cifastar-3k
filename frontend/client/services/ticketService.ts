@@ -13,6 +13,7 @@ export interface TicketResponse {
   status: string
   expiresAt: string
   purchaseDate?: string
+  createdAt?: string
 }
 
 export const getTicketsByBooking = async (bookingId: string): Promise<TicketResponse[]> => {
