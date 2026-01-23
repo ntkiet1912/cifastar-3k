@@ -11,7 +11,6 @@ import { useNotificationStore } from "@/stores";
 import { ROUTES } from "@/constants/routes";
 import { ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
 import { statusConfig, priorityConfig } from "@/constants/notificationConfig";
 
 export const ViewNotification = () => {
@@ -20,7 +19,7 @@ export const ViewNotification = () => {
   const [notification, setNotification] = useState<Notification | null>(null);
   const [loading, setLoading] = useState(true);
   const addNotification = useNotificationStore(
-    (state) => state.addNotification
+    (state) => state.addNotification,
   );
 
   useEffect(() => {

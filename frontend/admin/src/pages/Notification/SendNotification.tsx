@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import type {
   NotificationRequest,
   RecipientType,
@@ -79,7 +78,6 @@ export const SendNotification = () => {
     priority: "HIGH",
   });
 
-  const [metadataInput, setMetadataInput] = useState("");
   const [metadataFields, setMetadataFields] = useState<Record<string, string>>(
     {},
   );

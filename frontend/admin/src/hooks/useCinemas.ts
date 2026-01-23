@@ -1,7 +1,7 @@
 import { getAllCinemas } from "@/services/cinemaService";
 import { useNotificationStore } from "@/stores";
 import type { Cinema } from "@/types/CinemaType/cinemaType";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export function useCinemas() {
   const [cinemas, setCinemas] = useState<Cinema[]>([]);

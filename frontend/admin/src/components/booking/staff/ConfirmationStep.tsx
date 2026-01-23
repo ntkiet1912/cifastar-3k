@@ -1,19 +1,19 @@
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import type { Seat, ComboItem, Showtime } from "../../../lib/types"
-import type { Movie } from "@/services/movieService"
-import { format } from "date-fns"
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import type { Seat, ComboItem, Showtime } from "../../../lib/types";
+import type { MovieSimple } from "@/services/movieService";
+import { format } from "date-fns";
 
 interface ConfirmationStepProps {
-  selectedSeats: Seat[]
-  selectedCombos: ComboItem[]
-  showtime: Showtime & { roomName: string; cinemaName: string }
-  movie: Movie
-  subtotal: number
-  customerPoints: number
-  pointsUsed: number
-  pointsDiscount: number
-  onApplyPoints: (points: number) => void
+  selectedSeats: Seat[];
+  selectedCombos: ComboItem[];
+  showtime: Showtime & { roomName: string; cinemaName: string };
+  movie: MovieSimple;
+  subtotal: number;
+  customerPoints: number;
+  pointsUsed: number;
+  pointsDiscount: number;
+  onApplyPoints: (points: number) => void;
 }
 
 export default function ConfirmationStep({
@@ -28,16 +28,16 @@ export default function ConfirmationStep({
   onApplyPoints,
 }: ConfirmationStepProps) {
   const handlePointsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const points = parseInt(e.target.value) || 0
-    onApplyPoints(points)
-  }
+    const points = parseInt(e.target.value) || 0;
+    onApplyPoints(points);
+  };
 
-  const total = Math.max(0, subtotal - pointsDiscount)
+  const total = Math.max(0, subtotal - pointsDiscount);
   const maxRedeemablePoints = Math.min(
     customerPoints,
-    Math.floor(subtotal * 0.5 / 1000),
-    Math.floor(subtotal / 1000)
-  )
+    Math.floor((subtotal * 0.5) / 1000),
+    Math.floor(subtotal / 1000),
+  );
 
   return (
     <div className="space-y-6">
@@ -58,7 +58,9 @@ export default function ConfirmationStep({
               </div>
               <div>
                 <p className="text-gray-600">Time</p>
-                <p className="font-semibold">{format(new Date(showtime.time), "PPp")}</p>
+                <p className="font-semibold">
+                  {format(new Date(showtime.time), "PPp")}
+                </p>
               </div>
               <div>
                 <p className="text-gray-600">Room</p>
@@ -73,18 +75,24 @@ export default function ConfirmationStep({
 
           {/* Seats */}
           <Card className="p-4">
-            <h3 className="font-bold mb-3">Selected Seats ({selectedSeats.length})</h3>
+            <h3 className="font-bold mb-3">
+              Selected Seats ({selectedSeats.length})
+            </h3>
             <div className="flex flex-wrap gap-2">
               {selectedSeats
                 .sort((a, b) => {
                   if (a.row === b.row) {
-                    return a.number - b.number
+                    return a.number - b.number;
                   }
-                  return a.row.localeCompare(b.row)
+                  return a.row.localeCompare(b.row);
                 })
                 .map((seat) => (
-                  <span key={seat.id} className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm font-semibold">
-                    {seat.row}{seat.number}
+                  <span
+                    key={seat.id}
+                    className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded text-sm font-semibold"
+                  >
+                    {seat.row}
+                    {seat.number}
                   </span>
                 ))}
             </div>
@@ -97,9 +105,12 @@ export default function ConfirmationStep({
               <div className="space-y-2">
                 {selectedCombos.map((combo) => (
                   <div key={combo.id} className="flex justify-between text-sm">
-                    <span>{combo.name} × {combo.quantity}</span>
+                    <span>
+                      {combo.name} × {combo.quantity}
+                    </span>
                     <span className="font-semibold">
-                      {(combo.price * (combo.quantity || 1)).toLocaleString()} VND
+                      {(combo.price * (combo.quantity || 1)).toLocaleString()}{" "}
+                      VND
                     </span>
                   </div>
                 ))}
@@ -117,20 +128,28 @@ export default function ConfirmationStep({
               <div className="flex justify-between text-sm">
                 <span>Seats</span>
                 <span className="font-semibold">
-                  {selectedSeats.reduce((sum, s) => sum + (s.price || 0), 0).toLocaleString()} VND
+                  {selectedSeats
+                    .reduce((sum, s) => sum + (s.price || 0), 0)
+                    .toLocaleString()}{" "}
+                  VND
                 </span>
               </div>
               {selectedCombos.length > 0 && (
                 <div className="flex justify-between text-sm">
                   <span>Combos</span>
                   <span className="font-semibold">
-                    {selectedCombos.reduce((sum, c) => sum + (c.price * (c.quantity || 1)), 0).toLocaleString()} VND
+                    {selectedCombos
+                      .reduce((sum, c) => sum + c.price * (c.quantity || 1), 0)
+                      .toLocaleString()}{" "}
+                    VND
                   </span>
                 </div>
               )}
               <div className="border-t pt-2 flex justify-between">
                 <span className="font-semibold">Subtotal</span>
-                <span className="font-bold">{subtotal.toLocaleString()} VND</span>
+                <span className="font-bold">
+                  {subtotal.toLocaleString()} VND
+                </span>
               </div>
             </div>
           </Card>
@@ -143,7 +162,9 @@ export default function ConfirmationStep({
             </p>
             <div className="space-y-3">
               <div>
-                <label className="text-sm font-semibold">Points to redeem</label>
+                <label className="text-sm font-semibold">
+                  Points to redeem
+                </label>
                 <Input
                   type="number"
                   min="0"
@@ -154,7 +175,8 @@ export default function ConfirmationStep({
                   placeholder="0"
                 />
                 <p className="text-xs text-gray-600 mt-1">
-                  Max: {maxRedeemablePoints.toLocaleString()} points (50% of total)
+                  Max: {maxRedeemablePoints.toLocaleString()} points (50% of
+                  total)
                 </p>
               </div>
               {pointsDiscount > 0 && (
@@ -184,12 +206,14 @@ export default function ConfirmationStep({
               )}
               <div className="border-t border-white/30 pt-2 flex justify-between">
                 <span className="text-lg font-bold">Total</span>
-                <span className="text-2xl font-bold">{total.toLocaleString()} VND</span>
+                <span className="text-2xl font-bold">
+                  {total.toLocaleString()} VND
+                </span>
               </div>
             </div>
           </Card>
         </div>
       </div>
     </div>
-  )
+  );
 }

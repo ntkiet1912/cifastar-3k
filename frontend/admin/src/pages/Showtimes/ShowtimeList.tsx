@@ -56,7 +56,6 @@ export function ShowtimeList() {
 
   const {
     showtimes,
-    setShowtimes,
     loading,
     saving,
     confirmDialog,

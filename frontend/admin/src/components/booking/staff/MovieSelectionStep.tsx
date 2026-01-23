@@ -1,14 +1,14 @@
-import { Film } from "lucide-react"
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { useState, useMemo } from "react"
-import type { Movie } from "@/services/movieService"
+import { Film } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { useState, useMemo } from "react";
+import type { MovieSimple } from "@/services/movieService";
 
 interface MovieSelectionStepProps {
-  movies: Movie[]
-  loading: boolean
-  onSelectMovie: (movie: Movie) => void
-  selectedMovie: Movie | null
+  movies: MovieSimple[];
+  loading: boolean;
+  onSelectMovie: (movie: MovieSimple) => void;
+  selectedMovie: MovieSimple | null;
 }
 
 export default function MovieSelectionStep({
@@ -17,13 +17,13 @@ export default function MovieSelectionStep({
   onSelectMovie,
   selectedMovie,
 }: MovieSelectionStepProps) {
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredMovies = useMemo(() => {
-    return movies.filter(movie =>
-      movie.title.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-  }, [movies, searchQuery])
+    return movies.filter((movie) =>
+      movie.title.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+  }, [movies, searchQuery]);
 
   if (loading) {
     return (
@@ -33,7 +33,7 @@ export default function MovieSelectionStep({
           <p className="text-gray-600">Loading movies...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -73,17 +73,16 @@ export default function MovieSelectionStep({
                       alt={movie.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                       onError={(e) => {
-                        e.currentTarget.style.display = "none"
+                        e.currentTarget.style.display = "none";
                       }}
                     />
                   )}
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold truncate mb-2">{movie.title}</h3>
-                  <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                    {movie.description}
+                  <p className="text-xs text-gray-500">
+                    Duration: {movie.durationMinutes} min
                   </p>
-                  <p className="text-xs text-gray-500">Duration: {movie.durationMinutes} min</p>
                 </div>
               </Card>
             ))}
@@ -91,7 +90,9 @@ export default function MovieSelectionStep({
 
           {selectedMovie && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-semibold text-gray-900 mb-3">Selected Movie</h4>
+              <h4 className="font-semibold text-gray-900 mb-3">
+                Selected Movie
+              </h4>
               <div className="flex gap-4">
                 <div className="w-24 h-32 rounded-lg overflow-hidden flex-shrink-0">
                   {selectedMovie.posterUrl && (
@@ -100,15 +101,18 @@ export default function MovieSelectionStep({
                       alt={selectedMovie.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        e.currentTarget.style.display = "none"
+                        e.currentTarget.style.display = "none";
                       }}
                     />
                   )}
                 </div>
                 <div className="flex-1">
-                  <h5 className="font-bold text-lg mb-2">{selectedMovie.title}</h5>
-                  <p className="text-sm text-gray-600 mb-2">{selectedMovie.description}</p>
-                  <p className="text-xs text-gray-500">Duration: {selectedMovie.durationMinutes} minutes</p>
+                  <h5 className="font-bold text-lg mb-2">
+                    {selectedMovie.title}
+                  </h5>
+                  <p className="text-xs text-gray-500">
+                    Duration: {selectedMovie.durationMinutes} minutes
+                  </p>
                 </div>
               </div>
             </div>
@@ -116,5 +120,5 @@ export default function MovieSelectionStep({
         </div>
       )}
     </div>
-  )
+  );
 }

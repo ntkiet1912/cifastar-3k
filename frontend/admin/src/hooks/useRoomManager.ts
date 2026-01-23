@@ -7,7 +7,7 @@ import type { Room } from "@/types/RoomType/room";
 export function useRoomManager() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [saving] = useState(false);
 
   // const { confirmDialog, showConfirmDialog, closeConfirmDialog, confirmAndClose } = useConfirmDialog();
 

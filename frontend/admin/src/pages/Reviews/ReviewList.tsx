@@ -83,7 +83,8 @@ export function ReviewList() {
       setFilteredReviews(reviews);
     } else {
       const filtered = reviews.filter((review) => {
-        const customerName = `${review.customer.firstName} ${review.customer.lastName}`.toLowerCase();
+        const customerName =
+          `${review.customer.firstName} ${review.customer.lastName}`.toLowerCase();
         const movieTitle = review.movie.title.toLowerCase();
         const comment = (review.comment || "").toLowerCase();
         const query = searchQuery.toLowerCase();
@@ -174,12 +175,16 @@ export function ReviewList() {
           filteredCount={filteredReviews.length}
           icon={<MessageSquare className="w-4 h-4" />}
           label="reviews"
-          showAddButton={false}
+          buttonText="Add Review"
+          onAddClick={() => {}}
         />
       )}
 
       {/* Reviews Table */}
-      {searchQuery.trim() && filteredReviews.length === 0 && !loading && selectedMovie ? (
+      {searchQuery.trim() &&
+      filteredReviews.length === 0 &&
+      !loading &&
+      selectedMovie ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
           <Search className="w-12 h-12 text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium text-foreground mb-2">

@@ -1,15 +1,15 @@
-import { Clock, MapPin } from "lucide-react"
-import { Card } from "@/components/ui/card"
-import { format } from "date-fns"
-import { useEffect, useMemo, useState } from "react"
-import type { Movie } from "@/services/movieService"
-import type { ShowtimeResponse } from "@/services/showtimeService"
+import { Clock, MapPin } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { format } from "date-fns";
+import { useEffect, useMemo, useState } from "react";
+import type { MovieSimple } from "@/services/movieService";
+import type { ShowtimeResponse } from "@/services/showtimeService";
 
 interface ShowtimeSelectionStepProps {
-  movie: Movie
-  showtimes: ShowtimeResponse[]
-  loading: boolean
-  onSelectShowtime: (showtime: ShowtimeResponse) => void
+  movie: MovieSimple;
+  showtimes: ShowtimeResponse[];
+  loading: boolean;
+  onSelectShowtime: (showtime: ShowtimeResponse) => void;
 }
 
 export default function ShowtimeSelectionStep({
@@ -19,29 +19,38 @@ export default function ShowtimeSelectionStep({
   onSelectShowtime,
 }: ShowtimeSelectionStepProps) {
   const groupedByDate = useMemo(() => {
-    return showtimes.reduce((acc, showtime) => {
-      const date = format(new Date(showtime.startTime), "yyyy-MM-dd")
-      if (!acc[date]) {
-        acc[date] = []
-      }
-      acc[date].push(showtime)
-      return acc
-    }, {} as Record<string, ShowtimeResponse[]>)
-  }, [showtimes])
+    return showtimes.reduce(
+      (acc, showtime) => {
+        const date = format(new Date(showtime.startTime), "yyyy-MM-dd");
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push(showtime);
+        return acc;
+      },
+      {} as Record<string, ShowtimeResponse[]>,
+    );
+  }, [showtimes]);
 
-  const sortedDates = useMemo(() => Object.keys(groupedByDate).sort(), [groupedByDate])
-  const [selectedDate, setSelectedDate] = useState<string>("")
-  const [tempSelectedShowtime, setTempSelectedShowtime] = useState<ShowtimeResponse | null>(null)
+  const sortedDates = useMemo(
+    () => Object.keys(groupedByDate).sort(),
+    [groupedByDate],
+  );
+  const [selectedDate, setSelectedDate] = useState<string>("");
+  const [tempSelectedShowtime, setTempSelectedShowtime] =
+    useState<ShowtimeResponse | null>(null);
 
   useEffect(() => {
     if (sortedDates.length > 0 && !selectedDate) {
-      setSelectedDate(sortedDates[0])
+      setSelectedDate(sortedDates[0]);
     } else if (selectedDate && !sortedDates.includes(selectedDate)) {
-      setSelectedDate(sortedDates[0] || "")
+      setSelectedDate(sortedDates[0] || "");
     }
-  }, [sortedDates, selectedDate])
+  }, [sortedDates, selectedDate]);
 
-  const visibleShowtimes = selectedDate ? groupedByDate[selectedDate] || [] : []
+  const visibleShowtimes = selectedDate
+    ? groupedByDate[selectedDate] || []
+    : [];
 
   if (loading) {
     return (
@@ -51,7 +60,7 @@ export default function ShowtimeSelectionStep({
           <p className="text-gray-600">Loading showtimes...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -64,15 +73,16 @@ export default function ShowtimeSelectionStep({
               alt={movie.title}
               className="w-full h-full object-cover"
               onError={(e) => {
-                e.currentTarget.style.display = "none"
+                e.currentTarget.style.display = "none";
               }}
             />
           )}
         </div>
         <div>
           <h2 className="text-2xl font-bold mb-2">{movie.title}</h2>
-          <p className="text-gray-600 text-sm mb-2">{movie.description}</p>
-          <p className="text-gray-500 text-sm">Duration: {movie.durationMinutes} minutes</p>
+          <p className="text-gray-500 text-sm">
+            Duration: {movie.durationMinutes} minutes
+          </p>
         </div>
       </div>
 
@@ -100,7 +110,9 @@ export default function ShowtimeSelectionStep({
         <div className="space-y-6">
           <div>
             <h3 className="font-semibold text-lg mb-3">
-              {selectedDate ? format(new Date(selectedDate), "EEEE, MMMM d, yyyy") : ""}
+              {selectedDate
+                ? format(new Date(selectedDate), "EEEE, MMMM d, yyyy")
+                : ""}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {visibleShowtimes.map((showtime) => (
@@ -112,8 +124,8 @@ export default function ShowtimeSelectionStep({
                       : ""
                   }`}
                   onClick={() => {
-                    setTempSelectedShowtime(showtime)
-                    onSelectShowtime(showtime)
+                    setTempSelectedShowtime(showtime);
+                    onSelectShowtime(showtime);
                   }}
                 >
                   <div className="space-y-2">
@@ -125,7 +137,9 @@ export default function ShowtimeSelectionStep({
                       <MapPin className="w-3 h-3" />
                       {showtime.roomName}
                     </div>
-                    <p className="text-xs text-gray-500">{showtime.cinemaName}</p>
+                    <p className="text-xs text-gray-500">
+                      {showtime.cinemaName}
+                    </p>
                     <div className="text-xs font-semibold text-blue-600 mt-2">
                       {showtime.status === "SCHEDULED" && "Available"}
                       {showtime.status === "ONGOING" && "Ongoing"}
@@ -140,17 +154,26 @@ export default function ShowtimeSelectionStep({
           {tempSelectedShowtime && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="space-y-2">
-                <h4 className="font-semibold text-gray-900">Selected Showtime</h4>
+                <h4 className="font-semibold text-gray-900">
+                  Selected Showtime
+                </h4>
                 <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-gray-600" />
-                    <span className="font-semibold">{format(new Date(tempSelectedShowtime.startTime), "HH:mm")}</span>
+                    <span className="font-semibold">
+                      {format(
+                        new Date(tempSelectedShowtime.startTime),
+                        "HH:mm",
+                      )}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4 text-gray-600" />
                     <span>{tempSelectedShowtime.roomName}</span>
                   </div>
-                  <span className="text-gray-600">{tempSelectedShowtime.cinemaName}</span>
+                  <span className="text-gray-600">
+                    {tempSelectedShowtime.cinemaName}
+                  </span>
                 </div>
               </div>
             </div>
@@ -158,5 +181,5 @@ export default function ShowtimeSelectionStep({
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -3,6 +3,8 @@ import type { Movie, MovieSimple, CreateMovieRequest, UpdateMovieRequest } from 
 import { handleApiResponse } from "@/utils/apiResponse";
 import type { ApiResponse } from "@/utils/apiResponse";
 
+export type { Movie, MovieSimple, CreateMovieRequest, UpdateMovieRequest };
+
 const BASE_URL = "/movies";
 
 export const getAllMovies = async (): Promise<MovieSimple[]> => {

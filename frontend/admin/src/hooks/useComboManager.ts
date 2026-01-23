@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import type { Combo, ComboWithItems, CreateComboRequest, ComboItem } from "@/types/ComboType/comboType";
+import type { ComboWithItems, CreateComboRequest, ComboItem } from "@/types/ComboType/comboType";
 import {
   getAllCombos,
   createCombo,

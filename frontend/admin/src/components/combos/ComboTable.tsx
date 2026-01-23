@@ -1,6 +1,6 @@
 import type { ComboWithItems } from "@/types/ComboType/comboType";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, DollarSign, Package, ImageIcon } from "lucide-react";
+import { Pencil, Trash2, Package, ImageIcon } from "lucide-react";
 
 interface ComboTableProps {
   combos: ComboWithItems[];
@@ -36,9 +36,9 @@ export function ComboTable({
   }
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
     }).format(price);
   };
 
@@ -112,7 +112,7 @@ export function ComboTable({
                 <td className="px-6 py-4">
                   {combo.items && combo.items.length > 0 ? (
                     <div className="space-y-1">
-                      {combo.items.map((item, index) => (
+                      {combo.items.map((item) => (
                         <div
                           key={item.id}
                           className="text-sm text-muted-foreground"

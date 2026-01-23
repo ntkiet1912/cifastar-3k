@@ -24,7 +24,6 @@ import { useConfirmDialog } from "@/hooks/useConfirmDialog";
 import { Search, Eye, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { cn } from "@/lib/utils";
 
 const channelConfig = {
   EMAIL: {
@@ -49,12 +48,12 @@ export const LogList = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLog, setSelectedLog] = useState<NotificationLogDetail | null>(
-    null
+    null,
   );
   const [detailModalOpen, setDetailModalOpen] = useState(false);
 
   const addNotification = useNotificationStore(
-    (state) => state.addNotification
+    (state) => state.addNotification,
   );
 
   const { confirmDialog, showConfirmDialog, closeConfirmDialog } =
@@ -218,8 +217,8 @@ export const LogList = () => {
                           log.status === "SENT"
                             ? "default"
                             : log.status === "FAILED"
-                            ? "destructive"
-                            : "secondary"
+                              ? "destructive"
+                              : "secondary"
                         }
                       >
                         {log.status}
@@ -233,7 +232,7 @@ export const LogList = () => {
                         <span className="text-xs text-muted-foreground">
                           {JSON.stringify(log.providerResponse).substring(
                             0,
-                            50
+                            50,
                           )}
                           ...
                         </span>
@@ -326,8 +325,8 @@ export const LogList = () => {
                     selectedLog.status === "SENT"
                       ? "default"
                       : selectedLog.status === "FAILED"
-                      ? "destructive"
-                      : "secondary"
+                        ? "destructive"
+                        : "secondary"
                   }
                 >
                   {selectedLog.status}
@@ -339,7 +338,7 @@ export const LogList = () => {
                 <p className="text-sm text-muted-foreground">
                   {format(
                     new Date(selectedLog.sentAt),
-                    "MMMM dd, yyyy 'at' HH:mm:ss"
+                    "MMMM dd, yyyy 'at' HH:mm:ss",
                   )}
                 </p>
               </div>

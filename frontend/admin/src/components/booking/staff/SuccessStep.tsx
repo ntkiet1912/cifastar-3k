@@ -1,27 +1,27 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { CheckCircle, ChevronLeft, ChevronRight, Eye } from "lucide-react"
-import QRCode from "qrcode"
-import type { Seat, ComboItem } from "../../../lib/types"
-import { ticketService, type TicketResponse } from "@/services/ticketService"
-import jsPDF from "jspdf"
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { CheckCircle, ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import QRCode from "qrcode";
+import type { Seat, ComboItem } from "../../../lib/types";
+import { ticketService, type TicketResponse } from "@/services/ticketService";
+import jsPDF from "jspdf";
 
 interface SuccessStepProps {
-  bookingId: string
-  selectedSeats: Seat[]
-  selectedCombos: ComboItem[]
-  total: number
-  onNewBooking: () => void
+  bookingId: string;
+  selectedSeats: Seat[];
+  selectedCombos: ComboItem[];
+  total: number;
+  onNewBooking: () => void;
   movie?: {
-    title: string
-  }
+    title: string;
+  };
   showtime?: {
-    time: string
-    format: string
-  }
+    time: string;
+    format: string;
+  };
 }
 
 export default function SuccessStep({
@@ -33,26 +33,26 @@ export default function SuccessStep({
   movie,
   showtime,
 }: SuccessStepProps) {
-  const [tickets, setTickets] = useState<TicketResponse[]>([])
-  const [currentTicketIndex, setCurrentTicketIndex] = useState(0)
-  const [qrCodeUrls, setQrCodeUrls] = useState<string[]>([])
-  const [isLoadingTickets, setIsLoadingTickets] = useState(false)
-  const [viewMode, setViewMode] = useState<"payment" | "tickets">("payment")
-  const [hasLoadedTickets, setHasLoadedTickets] = useState(false)
+  const [tickets, setTickets] = useState<TicketResponse[]>([]);
+  const [currentTicketIndex, setCurrentTicketIndex] = useState(0);
+  const [qrCodeUrls, setQrCodeUrls] = useState<string[]>([]);
+  const [isLoadingTickets, setIsLoadingTickets] = useState(false);
+  const [viewMode, setViewMode] = useState<"payment" | "tickets">("payment");
+  const [hasLoadedTickets, setHasLoadedTickets] = useState(false);
 
   // Fetch tickets only when user clicks "View Tickets"
   const handleViewTickets = async () => {
     if (hasLoadedTickets) {
       // Already loaded, just switch view
-      setViewMode("tickets")
-      return
+      setViewMode("tickets");
+      return;
     }
 
     try {
-      setIsLoadingTickets(true)
-      setViewMode("tickets")
-      const fetchedTickets = await ticketService.getTicketsByBooking(bookingId)
-      setTickets(fetchedTickets)
+      setIsLoadingTickets(true);
+      setViewMode("tickets");
+      const fetchedTickets = await ticketService.getTicketsByBooking(bookingId);
+      setTickets(fetchedTickets);
 
       // Generate QR codes for all tickets
       const qrPromises = fetchedTickets.map((ticket) =>
@@ -63,115 +63,129 @@ export default function SuccessStep({
             dark: "#000000",
             light: "#FFFFFF",
           },
-        })
-      )
-      const qrUrls = await Promise.all(qrPromises)
-      setQrCodeUrls(qrUrls)
-      setHasLoadedTickets(true)
+        }),
+      );
+      const qrUrls = await Promise.all(qrPromises);
+      setQrCodeUrls(qrUrls);
+      setHasLoadedTickets(true);
     } catch (error) {
-      console.error("Failed to fetch tickets:", error)
+      console.error("Failed to fetch tickets:", error);
     } finally {
-      setIsLoadingTickets(false)
+      setIsLoadingTickets(false);
     }
-  }
+  };
 
   const handlePrevTicket = () => {
-    setCurrentTicketIndex((prev) => (prev > 0 ? prev - 1 : tickets.length - 1))
-  }
+    setCurrentTicketIndex((prev) => (prev > 0 ? prev - 1 : tickets.length - 1));
+  };
 
   const handleNextTicket = () => {
-    setCurrentTicketIndex((prev) => (prev < tickets.length - 1 ? prev + 1 : 0))
-  }
+    setCurrentTicketIndex((prev) => (prev < tickets.length - 1 ? prev + 1 : 0));
+  };
 
-  const generateTicketPage = (pdf: jsPDF, ticket: TicketResponse, qrCodeUrl: string | null, pageIndex: number) => {
-    const pageWidth = pdf.internal.pageSize.getWidth()
-    const pageHeight = pdf.internal.pageSize.getHeight()
-    const margin = 10
-    const contentWidth = pageWidth - margin * 2
-    let yPosition = margin
+  const generateTicketPage = (
+    pdf: jsPDF,
+    ticket: TicketResponse,
+    qrCodeUrl: string | null,
+    pageIndex: number,
+  ) => {
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 10;
+    const contentWidth = pageWidth - margin * 2;
+    let yPosition = margin;
 
     // Add new page if not the first ticket
     if (pageIndex > 0) {
-      pdf.addPage()
-      yPosition = margin
+      pdf.addPage();
+      yPosition = margin;
     }
 
     // Background color - White
-    pdf.setFillColor(255, 255, 255)
-    pdf.rect(margin, yPosition, contentWidth, pageHeight - margin * 2, "F")
+    pdf.setFillColor(255, 255, 255);
+    pdf.rect(margin, yPosition, contentWidth, pageHeight - margin * 2, "F");
 
     // Top border - Purple (matching seat-selection purple-600)
-    pdf.setDrawColor(147, 51, 234)
-    pdf.setLineWidth(3)
-    pdf.line(margin, yPosition + 3, pageWidth - margin, yPosition + 3)
-    yPosition += 8
+    pdf.setDrawColor(147, 51, 234);
+    pdf.setLineWidth(3);
+    pdf.line(margin, yPosition + 3, pageWidth - margin, yPosition + 3);
+    yPosition += 8;
 
     // Company Name - cifastar (top left)
-    pdf.setFontSize(14)
-    pdf.setFont(undefined, "bold")
-    pdf.setTextColor(147, 51, 234)
-    pdf.text("Cifastar", margin + 5, yPosition + 3)
-    yPosition += 10
+    pdf.setFontSize(14);
+    pdf.setFont("", "bold");
+    pdf.setTextColor(147, 51, 234);
+    pdf.text("Cifastar", margin + 5, yPosition + 3);
+    yPosition += 10;
 
     // Header - Movie Title (centered)
-    pdf.setFontSize(18)
-    pdf.setFont(undefined, "bold")
-    pdf.setTextColor(147, 51, 234)
-    const movieTitle = movie?.title || "MOVIE TICKET"
-    pdf.text(movieTitle, pageWidth / 2, yPosition, { align: "center", maxWidth: contentWidth - 4 })
-    yPosition += 12
+    pdf.setFontSize(18);
+    pdf.setFont("", "bold");
+    pdf.setTextColor(147, 51, 234);
+    const movieTitle = movie?.title || "MOVIE TICKET";
+    pdf.text(movieTitle, pageWidth / 2, yPosition, {
+      align: "center",
+      maxWidth: contentWidth - 4,
+    });
+    yPosition += 12;
 
     // Divider line
-    pdf.setDrawColor(168, 85, 247)
-    pdf.setLineWidth(0.5)
-    pdf.line(margin + 5, yPosition, pageWidth - margin - 5, yPosition)
-    yPosition += 6
+    pdf.setDrawColor(168, 85, 247);
+    pdf.setLineWidth(0.5);
+    pdf.line(margin + 5, yPosition, pageWidth - margin - 5, yPosition);
+    yPosition += 6;
 
     // QR Code Section
     if (qrCodeUrl) {
-      const qrSize = 45
-      const qrX = pageWidth / 2 - qrSize / 2
+      const qrSize = 45;
+      const qrX = pageWidth / 2 - qrSize / 2;
 
       // QR Code background
-      pdf.setFillColor(255, 255, 255)
-      pdf.rect(qrX - 3, yPosition - 2, qrSize + 6, qrSize + 6, "F")
+      pdf.setFillColor(255, 255, 255);
+      pdf.rect(qrX - 3, yPosition - 2, qrSize + 6, qrSize + 6, "F");
 
       // QR Code border - Purple
-      pdf.setDrawColor(147, 51, 234)
-      pdf.setLineWidth(0.5)
-      pdf.rect(qrX - 3, yPosition - 2, qrSize + 6, qrSize + 6)
+      pdf.setDrawColor(147, 51, 234);
+      pdf.setLineWidth(0.5);
+      pdf.rect(qrX - 3, yPosition - 2, qrSize + 6, qrSize + 6);
 
-      pdf.addImage(qrCodeUrl, "PNG", qrX, yPosition, qrSize, qrSize)
-      yPosition += qrSize + 8
+      pdf.addImage(qrCodeUrl, "PNG", qrX, yPosition, qrSize, qrSize);
+      yPosition += qrSize + 8;
     }
 
     // Divider line
-    pdf.setDrawColor(168, 85, 247)
-    pdf.setLineWidth(0.5)
-    pdf.line(margin + 5, yPosition, pageWidth - margin - 5, yPosition)
-    yPosition += 6
+    pdf.setDrawColor(168, 85, 247);
+    pdf.setLineWidth(0.5);
+    pdf.line(margin + 5, yPosition, pageWidth - margin - 5, yPosition);
+    yPosition += 6;
 
     // Ticket Details Section
-    pdf.setFontSize(11)
-    pdf.setFont(undefined, "normal")
-    pdf.setTextColor(0, 0, 0)
+    pdf.setFontSize(11);
+    pdf.setFont("", "normal");
+    pdf.setTextColor(0, 0, 0);
 
-    const labelX = margin + 6
-    const valueX = margin + 60
-    const lineHeight = 8
-    const boxPadding = 3
+    const labelX = margin + 6;
+    const valueX = margin + 60;
+    const lineHeight = 8;
+    const boxPadding = 3;
 
     // Seat Info Box - Purple background
-    pdf.setFillColor(240, 230, 255)
-    pdf.rect(margin + 3, yPosition - 1, contentWidth - 6, lineHeight + boxPadding * 2, "F")
+    pdf.setFillColor(240, 230, 255);
+    pdf.rect(
+      margin + 3,
+      yPosition - 1,
+      contentWidth - 6,
+      lineHeight + boxPadding * 2,
+      "F",
+    );
 
-    pdf.setFont(undefined, "bold")
-    pdf.setTextColor(147, 51, 234)
-    pdf.setFontSize(12)
-    pdf.text("SEAT", labelX, yPosition + boxPadding + 3)
-    pdf.setFontSize(14)
-    pdf.text(ticket.seatName, valueX, yPosition + boxPadding + 3)
-    yPosition += lineHeight + boxPadding * 2 + 2
+    pdf.setFont("", "bold");
+    pdf.setTextColor(147, 51, 234);
+    pdf.setFontSize(12);
+    pdf.text("SEAT", labelX, yPosition + boxPadding + 3);
+    pdf.setFontSize(14);
+    pdf.text(ticket.seatName, valueX, yPosition + boxPadding + 3);
+    yPosition += lineHeight + boxPadding * 2 + 2;
 
     // Details rows
     const details = [
@@ -179,84 +193,114 @@ export default function SuccessStep({
       { label: "Showtime:", value: showtime?.time || "N/A" },
       { label: "Format:", value: showtime?.format || "N/A" },
       { label: "Price:", value: `${ticket.price.toLocaleString()} VND` },
-    ]
+    ];
 
-    pdf.setFontSize(10)
+    pdf.setFontSize(10);
     details.forEach((detail, index) => {
       // Alternating background - Light purple
       if (index % 2 === 0) {
-        pdf.setFillColor(248, 243, 255)
-        pdf.rect(margin + 3, yPosition - 2, contentWidth - 6, lineHeight + 2, "F")
+        pdf.setFillColor(248, 243, 255);
+        pdf.rect(
+          margin + 3,
+          yPosition - 2,
+          contentWidth - 6,
+          lineHeight + 2,
+          "F",
+        );
       }
 
-      pdf.setFont(undefined, "bold")
-      pdf.setTextColor(147, 51, 234)
-      pdf.text(detail.label, labelX, yPosition + 2)
+      pdf.setFont("", "bold");
+      pdf.setTextColor(147, 51, 234);
+      pdf.text(detail.label, labelX, yPosition + 2);
 
-      pdf.setFont(undefined, "normal")
-      pdf.setTextColor(0, 0, 0)
-      pdf.text(detail.value, valueX, yPosition + 2, { maxWidth: 60 })
+      pdf.setFont("", "normal");
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(detail.value, valueX, yPosition + 2, { maxWidth: 60 });
 
-      yPosition += lineHeight + 3
-    })
+      yPosition += lineHeight + 3;
+    });
 
     // Divider line
-    yPosition += 2
-    pdf.setDrawColor(168, 85, 247)
-    pdf.setLineWidth(0.5)
-    pdf.line(margin + 5, yPosition, pageWidth - margin - 5, yPosition)
-    yPosition += 6
+    yPosition += 2;
+    pdf.setDrawColor(168, 85, 247);
+    pdf.setLineWidth(0.5);
+    pdf.line(margin + 5, yPosition, pageWidth - margin - 5, yPosition);
+    yPosition += 6;
 
     // Bottom Notice Box - Purple theme
-    pdf.setFillColor(245, 235, 255)
-    pdf.setDrawColor(147, 51, 234)
-    pdf.setLineWidth(1)
-    pdf.rect(margin + 3, yPosition, contentWidth - 6, 16, "FD")
+    pdf.setFillColor(245, 235, 255);
+    pdf.setDrawColor(147, 51, 234);
+    pdf.setLineWidth(1);
+    pdf.rect(margin + 3, yPosition, contentWidth - 6, 16, "FD");
 
-    pdf.setFontSize(9)
-    pdf.setFont(undefined, "bold")
-    pdf.setTextColor(147, 51, 234)
-    pdf.text("IMPORTANT:", margin + 6, yPosition + 4)
+    pdf.setFontSize(9);
+    pdf.setFont("", "bold");
+    pdf.setTextColor(147, 51, 234);
+    pdf.text("IMPORTANT:", margin + 6, yPosition + 4);
 
-    pdf.setFont(undefined, "normal")
-    pdf.setFontSize(8)
-    pdf.setTextColor(110, 40, 180)
-    pdf.text("Please show this QR code at the entrance", margin + 6, yPosition + 9)
+    pdf.setFont("", "normal");
+    pdf.setFontSize(8);
+    pdf.setTextColor(110, 40, 180);
+    pdf.text(
+      "Please show this QR code at the entrance",
+      margin + 6,
+      yPosition + 9,
+    );
 
-    yPosition += 18
+    yPosition += 18;
 
     // Footer - Purple accent
-    pdf.setFontSize(7)
-    pdf.setFont(undefined, "normal")
-    pdf.setTextColor(100, 100, 100)
-    pdf.text(`Booking ID: ${bookingId}`, pageWidth / 2, pageHeight - margin - 3, { align: "center" })
-    pdf.text(`Generated: ${new Date().toLocaleString()}`, pageWidth / 2, pageHeight - margin, { align: "center" })
+    pdf.setFontSize(7);
+    pdf.setFont("", "normal");
+    pdf.setTextColor(100, 100, 100);
+    pdf.text(
+      `Booking ID: ${bookingId}`,
+      pageWidth / 2,
+      pageHeight - margin - 3,
+      { align: "center" },
+    );
+    pdf.text(
+      `Generated: ${new Date().toLocaleString()}`,
+      pageWidth / 2,
+      pageHeight - margin,
+      { align: "center" },
+    );
 
     // Bottom border - Purple
-    pdf.setDrawColor(147, 51, 234)
-    pdf.setLineWidth(1)
-    pdf.line(margin, pageHeight - margin + 1, pageWidth - margin, pageHeight - margin + 1)
-  }
+    pdf.setDrawColor(147, 51, 234);
+    pdf.setLineWidth(1);
+    pdf.line(
+      margin,
+      pageHeight - margin + 1,
+      pageWidth - margin,
+      pageHeight - margin + 1,
+    );
+  };
 
   const handleDownloadTicketPdf = async () => {
-    if (!currentTicket) return
+    if (!currentTicket) return;
 
     try {
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
         format: "a4",
-      })
+      });
 
-      generateTicketPage(pdf, currentTicket, qrCodeUrls[currentTicketIndex] || null, 0)
-      pdf.save(`ticket-${currentTicket.ticketCode}.pdf`)
+      generateTicketPage(
+        pdf,
+        currentTicket,
+        qrCodeUrls[currentTicketIndex] || null,
+        0,
+      );
+      pdf.save(`ticket-${currentTicket.ticketCode}.pdf`);
     } catch (error) {
-      console.error("Error generating PDF:", error)
+      console.error("Error generating PDF:", error);
     }
-  }
+  };
 
   const handleDownloadAllTicketsPdf = async () => {
-    if (tickets.length === 0) return
+    if (tickets.length === 0) return;
 
     try {
       // Generate a separate PDF file for each ticket
@@ -265,17 +309,17 @@ export default function SuccessStep({
           orientation: "portrait",
           unit: "mm",
           format: "a4",
-        })
+        });
 
-        generateTicketPage(pdf, ticket, qrCodeUrls[index] || null, 0)
-        pdf.save(`ticket-${ticket.ticketCode}.pdf`)
-      })
+        generateTicketPage(pdf, ticket, qrCodeUrls[index] || null, 0);
+        pdf.save(`ticket-${ticket.ticketCode}.pdf`);
+      });
     } catch (error) {
-      console.error("Error generating PDF:", error)
+      console.error("Error generating PDF:", error);
     }
-  }
+  };
 
-  const currentTicket = tickets[currentTicketIndex]
+  const currentTicket = tickets[currentTicketIndex];
 
   return (
     <div className="space-y-6">
@@ -293,14 +337,18 @@ export default function SuccessStep({
           {/* Booking ID */}
           <div className="bg-white rounded-lg p-4 border-2 border-green-200">
             <p className="text-sm text-gray-600 mb-2">Booking ID</p>
-            <p className="font-mono text-xl font-bold text-green-700">{bookingId}</p>
+            <p className="font-mono text-xl font-bold text-green-700">
+              {bookingId}
+            </p>
           </div>
 
           {/* View Mode Toggle */}
           {viewMode === "payment" ? (
             // Payment Confirmation View (Default)
             <div className="space-y-4">
-              <h3 className="font-bold text-xl mb-4 text-center">Payment Details</h3>
+              <h3 className="font-bold text-xl mb-4 text-center">
+                Payment Details
+              </h3>
 
               {/* Payment Summary */}
               <div className="bg-white rounded-lg p-4 space-y-3">
@@ -321,18 +369,24 @@ export default function SuccessStep({
 
                 {selectedSeats.length > 0 && (
                   <div className="pb-3 border-b border-gray-200">
-                    <p className="text-sm text-gray-600 mb-1">Seats ({selectedSeats.length})</p>
+                    <p className="text-sm text-gray-600 mb-1">
+                      Seats ({selectedSeats.length})
+                    </p>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {selectedSeats
                         .sort((a, b) => {
                           if (a.row === b.row) {
-                            return a.number - b.number
+                            return a.number - b.number;
                           }
-                          return a.row.localeCompare(b.row)
+                          return a.row.localeCompare(b.row);
                         })
                         .map((seat) => (
-                          <span key={seat.id} className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm font-semibold">
-                            {seat.row}{seat.number}
+                          <span
+                            key={seat.id}
+                            className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm font-semibold"
+                          >
+                            {seat.row}
+                            {seat.number}
                           </span>
                         ))}
                     </div>
@@ -344,10 +398,18 @@ export default function SuccessStep({
                     <p className="text-sm text-gray-600 mb-2">Combos</p>
                     <div className="space-y-1">
                       {selectedCombos.map((combo) => (
-                        <div key={combo.id} className="text-sm flex justify-between">
-                          <span>{combo.name} × {combo.quantity}</span>
+                        <div
+                          key={combo.id}
+                          className="text-sm flex justify-between"
+                        >
+                          <span>
+                            {combo.name} × {combo.quantity}
+                          </span>
                           <span className="font-semibold">
-                            {(combo.price * (combo.quantity || 1)).toLocaleString()} VND
+                            {(
+                              combo.price * (combo.quantity || 1)
+                            ).toLocaleString()}{" "}
+                            VND
                           </span>
                         </div>
                       ))}
@@ -440,32 +502,48 @@ export default function SuccessStep({
                       <div className="space-y-3 text-center">
                         <div className="pb-3 border-b border-blue-200">
                           <p className="text-sm text-gray-600 mb-1">Seat</p>
-                          <p className="text-2xl font-bold text-blue-600">{currentTicket.seatName}</p>
+                          <p className="text-2xl font-bold text-blue-600">
+                            {currentTicket.seatName}
+                          </p>
                         </div>
 
                         {movie && (
                           <div className="pb-3 border-b border-blue-200">
                             <p className="text-sm text-gray-600 mb-1">Movie</p>
-                            <p className="text-lg font-semibold">{movie.title}</p>
+                            <p className="text-lg font-semibold">
+                              {movie.title}
+                            </p>
                           </div>
                         )}
 
                         {showtime && (
                           <div className="pb-3 border-b border-blue-200">
-                            <p className="text-sm text-gray-600 mb-1">Showtime</p>
-                            <p className="text-lg font-semibold">{showtime.time}</p>
-                            <p className="text-sm text-gray-600">{showtime.format}</p>
+                            <p className="text-sm text-gray-600 mb-1">
+                              Showtime
+                            </p>
+                            <p className="text-lg font-semibold">
+                              {showtime.time}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {showtime.format}
+                            </p>
                           </div>
                         )}
 
                         <div className="pb-3 border-b border-blue-200">
-                          <p className="text-sm text-gray-600 mb-1">Ticket Code</p>
-                          <p className="text-lg font-mono font-bold text-blue-600">{currentTicket.ticketCode}</p>
+                          <p className="text-sm text-gray-600 mb-1">
+                            Ticket Code
+                          </p>
+                          <p className="text-lg font-mono font-bold text-blue-600">
+                            {currentTicket.ticketCode}
+                          </p>
                         </div>
 
                         <div>
                           <p className="text-sm text-gray-600 mb-1">Price</p>
-                          <p className="text-lg font-semibold">{currentTicket.price.toLocaleString()} VND</p>
+                          <p className="text-lg font-semibold">
+                            {currentTicket.price.toLocaleString()} VND
+                          </p>
                         </div>
                       </div>
 
@@ -526,5 +604,5 @@ export default function SuccessStep({
         <p>Booking reference has been sent to the customer email</p>
       </div>
     </div>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import { RoomCard, AddRoomButton } from "@/components/rooms";
+import { RoomCard } from "@/components/rooms";
 import { useRoomManager } from "@/hooks/useRoomManager";
 import type { Room } from "@/types/RoomType/room";
 import { useEffect, useState, useMemo } from "react";
@@ -34,7 +34,7 @@ export function RoomList() {
       roomType: (room: Room, value: string) => room.roomType === value,
       cinema: (room: Room, value: string) => room.cinemaId === value,
     }),
-    []
+    [],
   );
 
   const { activeFilters, filteredData, handleFilterChange, clearFilters } =
@@ -58,7 +58,7 @@ export function RoomList() {
 
   // Apply search query on top of filtered data
   const filteredRooms = filteredData.filter((room) =>
-    room.name.toLowerCase().includes(searchQuery.toLowerCase())
+    room.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (

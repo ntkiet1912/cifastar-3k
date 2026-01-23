@@ -1,19 +1,19 @@
-import type { Seat, Showtime } from "../../../lib/types"
-import { useEffect, useState } from "react"
+import type { Seat, Showtime } from "../../../lib/types";
+import { useEffect, useState } from "react";
 
 interface SeatSelectionStepProps {
-  seats: Seat[]
-  selectedSeats: Seat[]
-  onSelectSeats: (seats: Seat[]) => void
-  showtime: Showtime & { roomName: string; cinemaName: string }
-  loading: boolean
-  error: string | null
-  customerName: string
-  customerEmail: string
-  checkoutMode: "guest" | "member"
-  onCustomerNameChange: (value: string) => void
-  onCustomerEmailChange: (value: string) => void
-  onCheckoutModeChange: (mode: "guest" | "member") => void
+  seats: Seat[];
+  selectedSeats: Seat[];
+  onSelectSeats: (seats: Seat[]) => void;
+  showtime: Showtime & { roomName: string; cinemaName: string };
+  loading: boolean;
+  error: string | null;
+  customerName: string;
+  customerEmail: string;
+  checkoutMode: "guest" | "member";
+  onCustomerNameChange: (value: string) => void;
+  onCustomerEmailChange: (value: string) => void;
+  onCheckoutModeChange: (mode: "guest" | "member") => void;
 }
 
 export default function SeatSelectionStep({
@@ -30,61 +30,66 @@ export default function SeatSelectionStep({
   onCustomerEmailChange,
   onCheckoutModeChange,
 }: SeatSelectionStepProps) {
-  const [groupedByRow, setGroupedByRow] = useState<Record<string, Seat[]>>({})
-  const [customerPhone, setCustomerPhone] = useState("")
+  const [groupedByRow, setGroupedByRow] = useState<Record<string, Seat[]>>({});
 
-  const isGuestCheckout = checkoutMode === "guest"
+  const isGuestCheckout = checkoutMode === "guest";
 
   useEffect(() => {
-    const grouped = seats.reduce((acc, seat) => {
-      if (!acc[seat.row]) {
-        acc[seat.row] = []
-      }
-      acc[seat.row].push(seat)
-      return acc
-    }, {} as Record<string, Seat[]>)
+    const grouped = seats.reduce(
+      (acc, seat) => {
+        if (!acc[seat.row]) {
+          acc[seat.row] = [];
+        }
+        acc[seat.row].push(seat);
+        return acc;
+      },
+      {} as Record<string, Seat[]>,
+    );
 
     // Sort each row by seat number
-    Object.keys(grouped).forEach(row => {
-      grouped[row].sort((a, b) => a.number - b.number)
-    })
+    Object.keys(grouped).forEach((row) => {
+      grouped[row].sort((a, b) => a.number - b.number);
+    });
 
-    setGroupedByRow(grouped)
-  }, [seats])
+    setGroupedByRow(grouped);
+  }, [seats]);
 
   const handleSeatClick = (seat: Seat) => {
-    if (!seat.isAvailable) return
+    if (!seat.isAvailable) return;
 
-    const isSelected = selectedSeats.some((s) => s.id === seat.id)
+    const isSelected = selectedSeats.some((s) => s.id === seat.id);
     if (isSelected) {
-      onSelectSeats(selectedSeats.filter((s) => s.id !== seat.id))
+      onSelectSeats(selectedSeats.filter((s) => s.id !== seat.id));
     } else {
-      onSelectSeats([...selectedSeats, seat])
+      onSelectSeats([...selectedSeats, seat]);
     }
-  }
+  };
 
   const getSeatColor = (seat: Seat) => {
-    const isSelected = selectedSeats.some((s) => s.id === seat.id)
+    const isSelected = selectedSeats.some((s) => s.id === seat.id);
 
     if (!seat.isAvailable) {
-      return "bg-red-500 text-white cursor-not-allowed"
+      return "bg-red-500 text-white cursor-not-allowed";
     }
 
     if (isSelected) {
-      return "bg-blue-600 text-white shadow-md"
+      return "bg-blue-600 text-white shadow-md";
     }
 
     switch (seat.type) {
       case "vip":
-        return "bg-amber-100 text-amber-900 hover:bg-amber-200"
+        return "bg-amber-100 text-amber-900 hover:bg-amber-200";
       case "couple":
-        return "bg-pink-100 text-pink-800 hover:bg-pink-200"
+        return "bg-pink-100 text-pink-800 hover:bg-pink-200";
       default:
-        return "bg-gray-100 text-gray-700 hover:bg-gray-200"
+        return "bg-gray-100 text-gray-700 hover:bg-gray-200";
     }
-  }
+  };
 
-  const seatTotal = selectedSeats.reduce((sum, seat) => sum + (seat.price || 0), 0)
+  const seatTotal = selectedSeats.reduce(
+    (sum, seat) => sum + (seat.price || 0),
+    0,
+  );
 
   if (loading) {
     return (
@@ -94,7 +99,7 @@ export default function SeatSelectionStep({
           <p className="text-gray-600">Loading seats...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -102,7 +107,7 @@ export default function SeatSelectionStep({
       <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
         <p className="text-red-800 font-semibold">Error: {error}</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -160,8 +165,13 @@ export default function SeatSelectionStep({
             <div className="flex justify-center pb-4">
               <div className="space-y-4">
                 {Object.entries(groupedByRow).map(([row, rowSeats]) => (
-                  <div key={row} className="flex items-center gap-3 justify-center">
-                    <div className="w-8 text-center font-bold text-gray-600 text-base">{row}</div>
+                  <div
+                    key={row}
+                    className="flex items-center gap-3 justify-center"
+                  >
+                    <div className="w-8 text-center font-bold text-gray-600 text-base">
+                      {row}
+                    </div>
                     <div className="flex gap-2">
                       {rowSeats.map((seat) => (
                         <button
@@ -173,11 +183,14 @@ export default function SeatSelectionStep({
                           disabled={!seat.isAvailable}
                           title={`Seat ${seat.row}${seat.number}`}
                         >
-                          {seat.row}{seat.number}
+                          {seat.row}
+                          {seat.number}
                         </button>
                       ))}
                     </div>
-                    <div className="w-8 text-center font-bold text-gray-600 text-base">{row}</div>
+                    <div className="w-8 text-center font-bold text-gray-600 text-base">
+                      {row}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -189,8 +202,13 @@ export default function SeatSelectionStep({
           <div className="border rounded-2xl bg-white shadow-sm p-4">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-500">Selected Seats</p>
-                <h3 className="text-lg font-semibold text-gray-900">{selectedSeats.length} seat{selectedSeats.length !== 1 ? "s" : ""}</h3>
+                <p className="text-xs uppercase tracking-wide text-gray-500">
+                  Selected Seats
+                </p>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {selectedSeats.length} seat
+                  {selectedSeats.length !== 1 ? "s" : ""}
+                </h3>
               </div>
               {selectedSeats.length > 0 && (
                 <button
@@ -209,17 +227,27 @@ export default function SeatSelectionStep({
                 {selectedSeats
                   .slice()
                   .sort((a, b) => {
-                    if (a.row === b.row) return a.number - b.number
-                    return a.row.localeCompare(b.row)
+                    if (a.row === b.row) return a.number - b.number;
+                    return a.row.localeCompare(b.row);
                   })
                   .map((seat) => (
-                    <div key={seat.id} className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2">
+                    <div
+                      key={seat.id}
+                      className="flex items-center justify-between rounded-lg border border-slate-100 px-3 py-2"
+                    >
                       <div>
-                        <p className="font-semibold text-gray-900">{seat.row}{seat.number}</p>
-                        <p className="text-xs text-gray-500 capitalize">{seat.type || "regular"}</p>
+                        <p className="font-semibold text-gray-900">
+                          {seat.row}
+                          {seat.number}
+                        </p>
+                        <p className="text-xs text-gray-500 capitalize">
+                          {seat.type || "regular"}
+                        </p>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-semibold text-gray-800">{(seat.price || 0).toLocaleString()} VND</span>
+                        <span className="text-sm font-semibold text-gray-800">
+                          {(seat.price || 0).toLocaleString()} VND
+                        </span>
                         <button
                           onClick={() => handleSeatClick(seat)}
                           className="text-gray-400 hover:text-red-500"
@@ -235,7 +263,9 @@ export default function SeatSelectionStep({
 
             <div className="border-t mt-4 pt-3 flex items-center justify-between text-base">
               <span className="text-gray-700 font-semibold">Subtotal</span>
-              <span className="text-xl font-bold text-blue-700">{seatTotal.toLocaleString()} VND</span>
+              <span className="text-xl font-bold text-blue-700">
+                {seatTotal.toLocaleString()} VND
+              </span>
             </div>
           </div>
 
@@ -249,7 +279,12 @@ export default function SeatSelectionStep({
                 checked={checkoutMode === "guest"}
                 onChange={() => onCheckoutModeChange("guest")}
               />
-              <label htmlFor="guest" className="text-sm font-semibold text-gray-900">Guest Checkout</label>
+              <label
+                htmlFor="guest"
+                className="text-sm font-semibold text-gray-900"
+              >
+                Guest Checkout
+              </label>
             </div>
             <div className="flex items-center gap-3">
               <input
@@ -260,12 +295,16 @@ export default function SeatSelectionStep({
                 checked={checkoutMode === "member"}
                 onChange={() => onCheckoutModeChange("member")}
               />
-              <label htmlFor="member" className="text-sm text-gray-700">Member (Get discount & points)</label>
+              <label htmlFor="member" className="text-sm text-gray-700">
+                Member (Get discount & points)
+              </label>
             </div>
 
             <div className="grid grid-cols-1 gap-3">
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Full name</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Full name
+                </label>
                 <input
                   type="text"
                   placeholder="Full name"
@@ -276,7 +315,9 @@ export default function SeatSelectionStep({
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-sm font-medium text-gray-700">Email address</label>
+                <label className="text-sm font-medium text-gray-700">
+                  Email address
+                </label>
                 <input
                   type="email"
                   placeholder="Email address"
@@ -291,5 +332,5 @@ export default function SeatSelectionStep({
         </div>
       </div>
     </div>
-  )
+  );
 }

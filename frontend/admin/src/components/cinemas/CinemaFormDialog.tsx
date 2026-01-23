@@ -10,7 +10,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Cinema, CreateCinemaRequest } from "@/types/CinemaType/cinemaType";
+import type {
+  Cinema,
+  CreateCinemaRequest,
+} from "@/types/CinemaType/cinemaType";
 import type { StaffProfile } from "@/types/StaffType/StaffProfile";
 import { Building2, MapPin, Phone, User } from "lucide-react";
 import { getAvailableManagers } from "@/services/staffService";
@@ -38,8 +41,12 @@ export function CinemaFormDialog({
     managerId: undefined,
   });
 
-  const [errors, setErrors] = useState<Partial<Record<keyof CreateCinemaRequest, string>>>({});
-  const [availableManagers, setAvailableManagers] = useState<StaffProfile[]>([]);
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof CreateCinemaRequest, string>>
+  >({});
+  const [availableManagers, setAvailableManagers] = useState<StaffProfile[]>(
+    [],
+  );
   const [loadingManagers, setLoadingManagers] = useState(false);
 
   // Load available managers
@@ -48,28 +55,30 @@ export function CinemaFormDialog({
       try {
         setLoadingManagers(true);
         const managers = await getAvailableManagers();
-        
+
         // If editing and cinema has a manager, ensure current manager is in the list
         if (cinema?.managerId && cinema?.managerName) {
-          const hasCurrentManager = managers.some(m => m.staffId === cinema.managerId);
+          const hasCurrentManager = managers.some(
+            (m) => m.staffId === cinema.managerId,
+          );
           if (!hasCurrentManager) {
             // Add current manager to the list
             const currentManager: StaffProfile = {
               staffId: cinema.managerId,
-              firstName: cinema.managerName.split(' ')[0] || cinema.managerName,
-              lastName: cinema.managerName.split(' ').slice(1).join(' ') || '',
-              dob: cinema.managerDob || '',
-              accountId: '',
-              accountType: '',
-              username: '',
-              email: '',
-              phoneNumber: '',
-              address: '',
-              gender: 'MALE',
+              firstName: cinema.managerName.split(" ")[0] || cinema.managerName,
+              lastName: cinema.managerName.split(" ").slice(1).join(" ") || "",
+              dob: cinema.managerDob || "",
+              accountId: "",
+              accountType: "",
+              username: "",
+              email: "",
+              phoneNumber: "",
+              address: "",
+              gender: "MALE",
               cinemaId: cinema.id,
-              jobTitle: 'Manager',
+              jobTitle: "Manager",
               avatarUrl: null,
-              roles: []
+              roles: [],
             };
             setAvailableManagers([currentManager, ...managers]);
           } else {
@@ -143,7 +152,6 @@ export function CinemaFormDialog({
       return;
     }
 
-  
     const submitData = {
       ...formData,
       managerId: formData.managerId || "",
@@ -155,7 +163,10 @@ export function CinemaFormDialog({
     }
   };
 
-  const handleChange = (field: keyof CreateCinemaRequest, value: string) => {
+  const handleChange = (
+    field: keyof CreateCinemaRequest,
+    value: string | undefined,
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
@@ -251,16 +262,28 @@ export function CinemaFormDialog({
         <div className="space-y-2">
           <Label htmlFor="managerId" className="flex items-center gap-2">
             <User className="h-4 w-4 text-muted-foreground" />
-            Manager <span className="text-sm text-muted-foreground">(Optional)</span>
+            Manager{" "}
+            <span className="text-sm text-muted-foreground">(Optional)</span>
           </Label>
           <div className="flex gap-2">
             <Select
               value={formData.managerId || "__none__"}
-              onValueChange={(value) => handleChange("managerId", value === "__none__" ? undefined : value)}
+              onValueChange={(value) =>
+                handleChange(
+                  "managerId",
+                  (value === "__none__" ? undefined : value) as
+                    | string
+                    | undefined,
+                )
+              }
               disabled={isLoading || loadingManagers}
             >
               <SelectTrigger className="flex-1">
-                <SelectValue placeholder={loadingManagers ? "Loading managers..." : "Select a manager"} />
+                <SelectValue
+                  placeholder={
+                    loadingManagers ? "Loading managers..." : "Select a manager"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="__none__">No manager assigned</SelectItem>
@@ -278,7 +301,8 @@ export function CinemaFormDialog({
             </Select>
           </div>
           <p className="text-xs text-muted-foreground">
-            Select a manager with manager role who is not currently managing any cinema
+            Select a manager with manager role who is not currently managing any
+            cinema
           </p>
         </div>
 

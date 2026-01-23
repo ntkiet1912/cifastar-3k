@@ -17,7 +17,7 @@ import SuccessStep from "@/components/booking/staff/SuccessStep";
 import { useAuthStore } from "@/stores/useAuthStore";
 import httpClient from "@/configurations/httpClient";
 import { getAllMovies } from "@/services/movieService";
-import type { MovieSimple as Movie } from "@/types/MovieType/Movie";
+import type { MovieSimple } from "@/types/MovieType/Movie";
 import {
   getShowtimesByMovie,
   type ShowtimeResponse,
@@ -62,8 +62,8 @@ export const TicketBookingPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
 
   // Data
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [movies, setMovies] = useState<MovieSimple[]>([]);
+  const [selectedMovie, setSelectedMovie] = useState<MovieSimple | null>(null);
   const [showtimes, setShowtimes] = useState<ShowtimeResponse[]>([]);
   const [selectedShowtime, setSelectedShowtime] =
     useState<ExtendedShowtime | null>(null);
@@ -444,7 +444,7 @@ export const TicketBookingPage = () => {
     };
   }, [bookingId]);
 
-  const handleSelectMovie = (movie: Movie) => {
+  const handleSelectMovie = (movie: MovieSimple) => {
     setSelectedMovie(movie);
     // Don't change step here - user must click "Select showtimes" button
     setSelectedShowtime(null);

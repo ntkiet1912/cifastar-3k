@@ -1,13 +1,5 @@
 import type { SeatType, SeatLayout } from "@/types/SeatType/seat";
-import {
-  ArrowLeft,
-  Plus,
-  Sofa,
-  Crown,
-  Heart,
-  Trash2,
-  Check,
-} from "lucide-react";
+import { Sofa, Crown, Heart, Check } from "lucide-react";
 import { Label } from "../ui";
 import { getRowLetter } from "@/utils/seatUtils";
 import { Button } from "../ui/button";
@@ -73,7 +65,7 @@ export function SeatLayoutEditor({
                   "relative flex items-center gap-2 transition-all",
                   isSelected
                     ? `ring-2 ring-offset-2 ring-gray-400 ${visual.colorClass} border-transparent text-white`
-                    : "hover:bg-gray-50"
+                    : "hover:bg-gray-50",
                 )}
               >
                 {visual.icon}
@@ -113,7 +105,7 @@ export function SeatLayoutEditor({
                         const seatId = `${rowLetter}${seatIndex + 1}`;
                         const seat = layout.seats.find((s) => s.id === seatId);
                         const currentTypeObj = seatTypes.find(
-                          (t) => t.id === seat?.seatTypeId
+                          (t) => t.id === seat?.seatTypeId,
                         );
                         const typeName = currentTypeObj
                           ? currentTypeObj.typeName
@@ -128,7 +120,7 @@ export function SeatLayoutEditor({
                             className={cn(
                               "h-9 sm:h-10 rounded-t-lg sm:rounded-lg flex flex-col items-center justify-center text-white shadow-sm transition-all duration-200 transform hover:-translate-y-1 hover:shadow-md active:scale-95",
                               visual.widthClass,
-                              visual.colorClass
+                              visual.colorClass,
                             )}
                             title={`${seatId} - ${typeName}`}
                           >
@@ -140,7 +132,7 @@ export function SeatLayoutEditor({
                             </span>
                           </button>
                         );
-                      }
+                      },
                     )}
                   </div>
                 </div>
@@ -159,7 +151,7 @@ export function SeatLayoutEditor({
               const visual = getSeatVisuals(type.typeName);
               // Đếm số ghế thuộc loại này trong layout hiện tại
               const count = layout.seats.filter(
-                (s) => s.seatTypeId === type.id
+                (s) => s.seatTypeId === type.id,
               ).length;
 
               return (
@@ -167,13 +159,13 @@ export function SeatLayoutEditor({
                   key={type.id}
                   className={cn(
                     "flex items-center gap-3 px-4 py-2 rounded-lg border",
-                    visual.lightBg
+                    visual.lightBg,
                   )}
                 >
                   <div
                     className={cn(
                       "p-1.5 rounded-md text-white shadow-sm",
-                      visual.colorClass
+                      visual.colorClass,
                     )}
                   >
                     {visual.icon}

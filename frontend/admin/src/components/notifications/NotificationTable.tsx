@@ -42,8 +42,8 @@ export function NotificationTable({
     const Icon = !isActive
       ? ArrowUpDown
       : sortDirection === "asc"
-      ? ArrowUp
-      : ArrowDown;
+        ? ArrowUp
+        : ArrowDown;
 
     return (
       <button
@@ -56,7 +56,7 @@ export function NotificationTable({
           <Icon
             className={cn(
               "w-4 h-4",
-              isActive ? "text-foreground" : "text-muted-foreground"
+              isActive ? "text-foreground" : "text-muted-foreground",
             )}
           />
         )}
@@ -126,14 +126,17 @@ export function NotificationTable({
                 priorityConfig[
                   notification.priority as keyof typeof priorityConfig
                 ];
-              const category = categoryConfig[notification.category];
+              const category =
+                categoryConfig[
+                  notification.category as keyof typeof categoryConfig
+                ];
 
               return (
                 <tr
                   key={notification.id}
                   className={cn(
                     "border-b border-border hover:bg-accent/50 transition-colors",
-                    index === notifications.length - 1 && "border-b-0"
+                    index === notifications.length - 1 && "border-b-0",
                   )}
                 >
                   {/* Title */}

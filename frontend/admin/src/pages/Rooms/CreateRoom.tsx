@@ -1,4 +1,4 @@
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,16 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui";
-import {
-  Activity,
-  Ban,
-  Crown,
-  Heart,
-  Plus,
-  Sofa,
-  Trash2,
-  Wrench,
-} from "lucide-react";
+import { Sofa, Plus, Trash2 } from "lucide-react";
 import { useNotificationStore } from "@/stores";
 import { RoomStatus, RoomType } from "@/types/RoomType/room";
 import { ROUTES } from "@/constants/routes";
@@ -41,7 +32,7 @@ import { createRoom } from "@/services/roomService";
 export function CreateRoom() {
   const navigate = useNavigate();
   const addNotification = useNotificationStore(
-    (state) => state.addNotification
+    (state) => state.addNotification,
   );
 
   const [availableSeatTypes, setAvailableSeatTypes] = useState<SeatType[]>([]);
@@ -53,7 +44,7 @@ export function CreateRoom() {
         setAvailableSeatTypes(types);
         if (types.length > 0) {
           const standardType = types.find(
-            (t) => t.typeName.toLocaleUpperCase() === RoomType.STANDARD
+            (t) => t.typeName.toLocaleUpperCase() === RoomType.STANDARD,
           );
           setSelectedSeatTypeId(standardType ? standardType.id : types[0].id);
         }
@@ -90,7 +81,7 @@ export function CreateRoom() {
 
   const handleInputChange = (
     field: keyof CreateRoomRequest,
-    value: string | number
+    value: string | number,
   ) => {
     console.log(formData);
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -98,7 +89,7 @@ export function CreateRoom() {
 
   const onDimensionChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    field: "rows" | "seatsPerRow"
+    field: "rows" | "seatsPerRow",
   ) => {
     const rawValue = e.target.value;
     let value = rawValue === "" ? 0 : parseInt(rawValue);

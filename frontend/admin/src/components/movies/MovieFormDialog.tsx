@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/Modal";
-import type { Movie, CreateMovieRequest, Genre, AgeRating } from "@/types/MovieType/Movie";
+import type {
+  Movie,
+  CreateMovieRequest,
+  Genre,
+  AgeRating,
+} from "@/types/MovieType/Movie";
 import { getAllGenres } from "@/services/genreService";
 import { getAllAgeRatings } from "@/services/ageRatingService";
 
@@ -26,7 +31,7 @@ export function MovieFormDialog({
     description: "",
     durationMinutes: 90,
     director: "",
-    cast: "",
+    castMembers: "",
     posterUrl: "",
     trailerUrl: "",
     releaseDate: "",
@@ -68,7 +73,7 @@ export function MovieFormDialog({
         description: movie.description,
         durationMinutes: movie.durationMinutes,
         director: movie.director,
-        cast: movie.cast,
+        castMembers: movie.castMembers,
         posterUrl: movie.posterUrl,
         trailerUrl: movie.trailerUrl,
         releaseDate: movie.releaseDate,
@@ -83,7 +88,7 @@ export function MovieFormDialog({
         description: "",
         durationMinutes: 90,
         director: "",
-        cast: "",
+        castMembers: "",
         posterUrl: "",
         trailerUrl: "",
         releaseDate: "",
@@ -123,10 +128,10 @@ export function MovieFormDialog({
       newErrors.director = "Director must not exceed 255 characters";
     }
 
-    if (!formData.cast || !formData.cast.trim()) {
-      newErrors.cast = "Cast is required";
-    } else if (formData.cast.length > 2000) {
-      newErrors.cast = "Cast must not exceed 2000 characters";
+    if (!formData.castMembers || !formData.castMembers.trim()) {
+      newErrors.castMembers = "Cast is required";
+    } else if (formData.castMembers.length > 2000) {
+      newErrors.castMembers = "Cast must not exceed 2000 characters";
     }
 
     // URL validation - must start with http:// or https://
@@ -180,10 +185,25 @@ export function MovieFormDialog({
 
     // Debug logging - show what we're sending
     console.group("🎬 Movie Form Submission");
-    console.log("Form data being submitted:", JSON.stringify(formData, null, 2));
+    console.log(
+      "Form data being submitted:",
+      JSON.stringify(formData, null, 2),
+    );
     console.log("Data types check:");
-    console.log("- durationMinutes type:", typeof formData.durationMinutes, "value:", formData.durationMinutes);
-    console.log("- genreIds type:", typeof formData.genreIds, "isArray:", Array.isArray(formData.genreIds), "value:", formData.genreIds);
+    console.log(
+      "- durationMinutes type:",
+      typeof formData.durationMinutes,
+      "value:",
+      formData.durationMinutes,
+    );
+    console.log(
+      "- genreIds type:",
+      typeof formData.genreIds,
+      "isArray:",
+      Array.isArray(formData.genreIds),
+      "value:",
+      formData.genreIds,
+    );
     console.log("- status:", formData.status);
     console.log("- ageRatingId:", formData.ageRatingId);
     console.groupEnd();
@@ -195,7 +215,9 @@ export function MovieFormDialog({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value } = e.target;
 
@@ -203,12 +225,19 @@ export function MovieFormDialog({
 
     // Auto-add https:// to URLs when user leaves the field (on blur would be better, but this works on change)
     // We'll only auto-correct when the value looks like a URL but is missing the protocol
-    if ((name === "posterUrl" || name === "trailerUrl") && value && !value.match(/^https?:\/\//)) {
+    if (
+      (name === "posterUrl" || name === "trailerUrl") &&
+      value &&
+      !value.match(/^https?:\/\//)
+    ) {
       // Check if it looks like a URL (contains a dot)
       if (value.includes(".")) {
         // Don't auto-correct while typing, wait for a complete-looking URL
         // Only auto-correct if it starts with common patterns
-        if (value.startsWith("www.") || value.match(/^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/)) {
+        if (
+          value.startsWith("www.") ||
+          value.match(/^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}/)
+        ) {
           processedValue = `https://${value}`;
         }
       }
@@ -216,7 +245,10 @@ export function MovieFormDialog({
 
     setFormData((prev) => ({
       ...prev,
-      [name]: name === "durationMinutes" ? parseInt(processedValue) || 0 : processedValue,
+      [name]:
+        name === "durationMinutes"
+          ? parseInt(processedValue) || 0
+          : processedValue,
     }));
     // Clear error for this field
     if (errors[name]) {
@@ -267,7 +299,10 @@ export function MovieFormDialog({
       title={movie ? "Edit Movie" : "Add New Movie"}
       maxWidth="2xl"
     >
-      <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 max-h-[70vh] overflow-y-auto pr-2"
+      >
         {/* Title */}
         <div>
           <label className="block text-sm font-medium mb-1.5 text-foreground">
@@ -304,7 +339,9 @@ export function MovieFormDialog({
             }`}
           />
           {errors.description && (
-            <p className="text-xs text-destructive mt-1">{errors.description}</p>
+            <p className="text-xs text-destructive mt-1">
+              {errors.description}
+            </p>
           )}
         </div>
 
@@ -343,7 +380,9 @@ export function MovieFormDialog({
               className={errors.durationMinutes ? "border-destructive" : ""}
             />
             {errors.durationMinutes && (
-              <p className="text-xs text-destructive mt-1">{errors.durationMinutes}</p>
+              <p className="text-xs text-destructive mt-1">
+                {errors.durationMinutes}
+              </p>
             )}
           </div>
         </div>
@@ -355,15 +394,17 @@ export function MovieFormDialog({
           </label>
           <Input
             type="text"
-            name="cast"
-            value={formData.cast}
+            name="castMembers"
+            value={formData.castMembers}
             onChange={handleChange}
             placeholder="Actor 1, Actor 2, Actor 3"
             disabled={saving}
-            className={errors.cast ? "border-destructive" : ""}
+            className={errors.castMembers ? "border-destructive" : ""}
           />
-          {errors.cast && (
-            <p className="text-xs text-destructive mt-1">{errors.cast}</p>
+          {errors.castMembers && (
+            <p className="text-xs text-destructive mt-1">
+              {errors.castMembers}
+            </p>
           )}
         </div>
 
@@ -383,9 +424,13 @@ export function MovieFormDialog({
               className={errors.posterUrl ? "border-destructive" : ""}
             />
             {errors.posterUrl ? (
-              <p className="text-xs text-destructive mt-1">{errors.posterUrl}</p>
+              <p className="text-xs text-destructive mt-1">
+                {errors.posterUrl}
+              </p>
             ) : (
-              <p className="text-xs text-muted-foreground mt-1">Must start with http:// or https://</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Must start with http:// or https://
+              </p>
             )}
           </div>
 
@@ -403,9 +448,13 @@ export function MovieFormDialog({
               className={errors.trailerUrl ? "border-destructive" : ""}
             />
             {errors.trailerUrl ? (
-              <p className="text-xs text-destructive mt-1">{errors.trailerUrl}</p>
+              <p className="text-xs text-destructive mt-1">
+                {errors.trailerUrl}
+              </p>
             ) : (
-              <p className="text-xs text-muted-foreground mt-1">Must start with http:// or https://</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Must start with http:// or https://
+              </p>
             )}
           </div>
         </div>
@@ -425,7 +474,9 @@ export function MovieFormDialog({
               className={errors.releaseDate ? "border-destructive" : ""}
             />
             {errors.releaseDate && (
-              <p className="text-xs text-destructive mt-1">{errors.releaseDate}</p>
+              <p className="text-xs text-destructive mt-1">
+                {errors.releaseDate}
+              </p>
             )}
           </div>
 
@@ -487,7 +538,9 @@ export function MovieFormDialog({
               ))}
             </select>
             {errors.ageRatingId && (
-              <p className="text-xs text-destructive mt-1">{errors.ageRatingId}</p>
+              <p className="text-xs text-destructive mt-1">
+                {errors.ageRatingId}
+              </p>
             )}
           </div>
         </div>

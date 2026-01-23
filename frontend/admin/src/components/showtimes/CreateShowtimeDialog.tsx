@@ -42,17 +42,20 @@ interface CreateShowtimeDialogProps {
 export function CreateShowtimeDialog({
   open,
   onClose,
-  cinemaId,
   cinemaName,
   cinemaBuffer,
   rooms,
   onSuccess,
 }: CreateShowtimeDialogProps) {
-  const addNotification = useNotificationStore((state) => state.addNotification);
+  const addNotification = useNotificationStore(
+    (state) => state.addNotification,
+  );
 
   const [loading, setLoading] = useState(false);
   const [movies, setMovies] = useState<MovieSimple[]>([]);
-  const [existingShowtimes, setExistingShowtimes] = useState<ShowtimeResponse[]>([]);
+  const [existingShowtimes, setExistingShowtimes] = useState<
+    ShowtimeResponse[]
+  >([]);
 
   const [selectedMovieId, setSelectedMovieId] = useState("");
   const [selectedRoomId, setSelectedRoomId] = useState("");
@@ -63,7 +66,7 @@ export function CreateShowtimeDialog({
     if (open) {
       loadMovies();
       resetForm();
-      console.log('CreateShowtimeDialog - cinemaBuffer:', cinemaBuffer);
+      console.log("CreateShowtimeDialog - cinemaBuffer:", cinemaBuffer);
     }
   }, [open, cinemaBuffer]);
 
@@ -194,7 +197,9 @@ export function CreateShowtimeDialog({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl dark:bg-gray-900">
         <DialogHeader>
-          <DialogTitle className="dark:text-gray-100">Create New Showtime</DialogTitle>
+          <DialogTitle className="dark:text-gray-100">
+            Create New Showtime
+          </DialogTitle>
           <DialogDescription>
             Create a new showtime at cinema: <strong>{cinemaName}</strong>
           </DialogDescription>
@@ -207,7 +212,11 @@ export function CreateShowtimeDialog({
               <MapPin className="h-4 w-4" />
               Cinema
             </Label>
-            <Input value={cinemaName} disabled className="bg-gray-100 dark:bg-gray-800" />
+            <Input
+              value={cinemaName}
+              disabled
+              className="bg-gray-100 dark:bg-gray-800"
+            />
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Cinema is fixed based on your selection
             </p>
@@ -287,8 +296,7 @@ export function CreateShowtimeDialog({
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 {cinemaBuffer !== undefined && cinemaBuffer !== null
                   ? `Auto-calculated: ${selectedMovie.durationMinutes} min (movie) + ${cinemaBuffer} min (buffer)`
-                  : `Auto-calculated based on movie duration (${selectedMovie.durationMinutes} min)`
-                }
+                  : `Auto-calculated based on movie duration (${selectedMovie.durationMinutes} min)`}
               </p>
             )}
           </div>

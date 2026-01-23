@@ -19,11 +19,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2 } from "lucide-react";
 import { ROUTES } from "@/constants/routes";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { cn } from "@/lib/utils";
 
 export const TemplateList = () => {
   const navigate = useNavigate();

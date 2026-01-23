@@ -1,4 +1,3 @@
-import React from "react";
 import type { MediaFile } from "@/types/media.types";
 import { formatFileSize } from "@/services/mediaService";
 import { FileTypeIcon } from "./FileTypeIcon";

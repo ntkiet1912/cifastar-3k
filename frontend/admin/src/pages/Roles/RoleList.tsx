@@ -10,15 +10,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useRoleManager } from "@/hooks/useRoleManager";
 import { ROUTES } from "@/constants/routes";
 import type { Role } from "@/services/roleService";
-import {
-  Plus,
-  Pencil,
-  Trash2,
-  Shield,
-  Search,
-  X,
-  ShieldCheck,
-} from "lucide-react";
+import { Plus, Pencil, Trash2, Shield, ShieldCheck } from "lucide-react";
 
 export function RoleList() {
   const navigate = useNavigate();
@@ -45,7 +37,7 @@ export function RoleList() {
   const filteredRoles = roles.filter(
     (role) =>
       role.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      role.description.toLowerCase().includes(searchQuery.toLowerCase())
+      role.description.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleOpenCreateDialog = () => {
