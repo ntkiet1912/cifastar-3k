@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Plus, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ROUTES } from "@/constants/routes";
 import { CinemaSelector } from "@/components/showtimes/CinemaSelector";
 import { RoomFilter } from "@/components/showtimes/RoomFilter";
 import { ShowtimeCalendar } from "@/components/showtimes/ShowtimeCalendar";
@@ -148,8 +149,8 @@ export function ShowtimeCalendarPage() {
 
     const queryString = params.toString();
     const newUrl = queryString
-      ? `/admin/showtimes?${queryString}`
-      : "/admin/showtimes";
+      ? `${ROUTES.SHOWTIMES}?${queryString}`
+      : ROUTES.SHOWTIMES;
     navigate(newUrl, { replace: true });
   };
 

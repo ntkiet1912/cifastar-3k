@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { usePermissions } from "@/hooks/usePermissions";
 import { PERMISSIONS } from "@/constants/permissions";
+import { ROUTES } from "@/constants/routes";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useTodayRevenue } from "@/hooks/useTodayRevenue";
 import { useTodayShowtimes } from "@/hooks/useTodayShowtimes";
@@ -229,7 +230,7 @@ export function DashboardOverview() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {hasPermission(PERMISSIONS.BOOKING_CREATE) && (
             <button
-              onClick={() => navigate("/admin/ticket-booking")}
+              onClick={() => navigate(ROUTES.TICKET_BOOKING)}
               className="p-4 bg-muted hover:bg-muted/80 rounded-lg transition-colors text-left cursor-pointer"
             >
               <Ticket className="w-6 h-6 mb-2 text-blue-600" />
@@ -240,7 +241,7 @@ export function DashboardOverview() {
           )}
           {hasPermission(PERMISSIONS.MOVIE_READ) && (
             <button
-              onClick={() => navigate("/admin/movies")}
+              onClick={() => navigate(ROUTES.MOVIES)}
               className="p-4 bg-muted hover:bg-muted/80 rounded-lg transition-colors text-left cursor-pointer"
             >
               <Film className="w-6 h-6 mb-2 text-purple-600" />
@@ -249,7 +250,7 @@ export function DashboardOverview() {
           )}
           {hasPermission(PERMISSIONS.SHOWTIME_READ) && (
             <button
-              onClick={() => navigate("/admin/showtimes")}
+              onClick={() => navigate(ROUTES.SHOWTIMES)}
               className="p-4 bg-muted hover:bg-muted/80 rounded-lg transition-colors text-left cursor-pointer"
             >
               <Calendar className="w-6 h-6 mb-2 text-orange-600" />
@@ -258,7 +259,7 @@ export function DashboardOverview() {
           )}
           {hasPermission(PERMISSIONS.CUSTOMER_READ) && (
             <button
-              onClick={() => navigate("/admin/customers")}
+              onClick={() => navigate(ROUTES.CUSTOMERS)}
               className="p-4 bg-muted hover:bg-muted/80 rounded-lg transition-colors text-left cursor-pointer"
             >
               <Users className="w-6 h-6 mb-2 text-cyan-600" />
@@ -267,7 +268,7 @@ export function DashboardOverview() {
           )}
           {hasPermission(PERMISSIONS.REPORT_READ) && (
             <button
-              onClick={() => navigate("/admin/reports")}
+              onClick={() => navigate(ROUTES.REPORTS)}
               className="p-4 bg-muted hover:bg-muted/80 rounded-lg transition-colors text-left cursor-pointer"
             >
               <ChartColumn className="w-6 h-6 mb-2 text-green-600" />
@@ -276,7 +277,7 @@ export function DashboardOverview() {
           )}
           {hasPermission(PERMISSIONS.STAFF_READ) && (
             <button
-              onClick={() => navigate("/admin/staff")}
+              onClick={() => navigate(ROUTES.STAFF)}
               className="p-4 bg-muted hover:bg-muted/80 rounded-lg transition-colors text-left cursor-pointer"
             >
               <UserCog className="w-6 h-6 mb-2 text-indigo-600" />

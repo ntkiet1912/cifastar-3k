@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Loader2, Smartphone, Wallet } from "lucide-react";
 import { format } from "date-fns";
+import { ROUTES } from "@/constants/routes";
 import type { Seat, ComboItem, Showtime } from "../../../lib/types";
 import type { MovieSimple } from "@/services/movieService";
 import httpClient from "@/configurations/httpClient";
@@ -125,7 +126,7 @@ export default function PaymentStep({
       // Force a stable return URL for VNPay (admin app on port 5173)
       const returnUrl =
         typeof window !== "undefined"
-          ? `${window.location.origin}/admin/ticket-booking`
+          ? `${window.location.origin}${ROUTES.TICKET_BOOKING}`
           : undefined;
 
       // Tạo hóa đơn cho booking
