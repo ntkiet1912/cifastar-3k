@@ -200,16 +200,7 @@ export default function BookingPage({
       if (seatData && Array.isArray(seatData)) {
         const mappedSeats = seatData
           .map((seat, idx) => mapScreeningSeatToSeat(seat, idx))
-          .filter((seat): seat is Seat => seat !== null)
-          .sort((a, b) => {
-            if (a.row === b.row) {
-              return a.number - b.number;
-            }
-            return a.row.localeCompare(b.row, undefined, {
-              numeric: true,
-              sensitivity: "base",
-            });
-          });
+          .filter((seat): seat is Seat => seat !== null);
         setSeats(mappedSeats);
         console.log("Seats reloaded successfully");
       } else {
@@ -414,14 +405,15 @@ export default function BookingPage({
           ? data
               .map((combo) => mapComboForDisplay(combo))
               .filter(
-                (combo): combo is ComboItem => combo !== null && !combo.deleted,
+                (combo): combo is ComboItem =>
+                  combo !== null && !combo?.deleted,
               )
           : [];
 
         const combosWithItems = await Promise.all(
           mapped.map(async (combo) => {
             try {
-              const items = await getComboItemsByComboId(combo.id);
+              const items = await getComboItemsByComboId(combo?.id || "");
               const mappedItems = Array.isArray(items)
                 ? items
                     .map((item) => mapComboItemDetail(item))
@@ -465,16 +457,7 @@ export default function BookingPage({
           // Map backend seats to Seat format and sort by row then seat number
           const mappedSeats = seatData
             .map((seat, idx) => mapScreeningSeatToSeat(seat, idx))
-            .filter((seat): seat is Seat => seat !== null)
-            .sort((a, b) => {
-              if (a.row === b.row) {
-                return a.number - b.number;
-              }
-              return a.row.localeCompare(b.row, undefined, {
-                numeric: true,
-                sensitivity: "base",
-              });
-            });
+            .filter((seat): seat is Seat => seat !== null);
           setSeats(mappedSeats);
         } else {
           // Show error if no seats from backend
@@ -484,7 +467,7 @@ export default function BookingPage({
           );
           setSeats([]);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error fetching seats:", error);
         // Show error instead of fallback to mock data
         setSeatsError(
@@ -717,13 +700,14 @@ export default function BookingPage({
         : "Next";
 
   const summarySeatCount = useBookingSummary
-    ? bookingSummary?.seats?.length ?? selectedSeats.length
+    ? (bookingSummary?.seats?.length ?? selectedSeats.length)
     : selectedSeats.length;
   const summaryComboCount = useBookingSummary
-    ? bookingSummary?.combos?.reduce(
+    ? (bookingSummary?.combos?.reduce(
         (sum, combo) => sum + (combo.quantity || 1),
         0,
-      ) ?? selectedCombos.reduce((sum, combo) => sum + (combo.quantity || 1), 0)
+      ) ??
+      selectedCombos.reduce((sum, combo) => sum + (combo.quantity || 1), 0))
     : selectedCombos.reduce((sum, combo) => sum + (combo.quantity || 1), 0);
 
   const handleNextStep = async () => {
@@ -792,7 +776,7 @@ export default function BookingPage({
         );
 
         if (!validation.isValid) {
-          setOrphanSeatError(validation.message);
+          setOrphanSeatError(validation.message || null);
           setIsCreatingBooking(false);
           return;
         }
@@ -843,16 +827,7 @@ export default function BookingPage({
             if (seatData && Array.isArray(seatData)) {
               const mappedSeats = seatData
                 .map((seat, idx) => mapScreeningSeatToSeat(seat, idx))
-                .filter((seat): seat is Seat => seat !== null)
-                .sort((a, b) => {
-                  if (a.row === b.row) {
-                    return a.number - b.number;
-                  }
-                  return a.row.localeCompare(b.row, undefined, {
-                    numeric: true,
-                    sensitivity: "base",
-                  });
-                });
+                .filter((seat): seat is Seat => seat !== null);
               setSeats(mappedSeats);
             } else {
               setSeatsError(
@@ -907,7 +882,8 @@ export default function BookingPage({
         if (combosPayload.length !== selectedCombos.length) {
           setGeneralError({
             title: "Combo Update Error",
-            message: "One or more selected combos are invalid. Please reselect.",
+            message:
+              "One or more selected combos are invalid. Please reselect.",
           });
           return;
         }

@@ -29,9 +29,9 @@ export interface Seat {
   row: string
   number: number
   isAvailable: boolean
-  isSelected?: boolean
-  type?: "standard" | "vip" | "couple"
-  price?: number
+  isSelected: boolean
+  type: "standard" | "vip" | "couple"
+  price: number
   // Transfer information
   isForTransfer?: boolean
   transferTicketId?: string

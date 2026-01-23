@@ -2,6 +2,7 @@ import axios from 'axios'
 import { clearAuthData } from '@/services/localStorageService'
 import { requestTokenRefresh } from "@/services/tokenRefresh";
 import { useAuthStore } from '@/store'
+import type { Seat, ComboItem } from './types'
 
 
 const API_BASE_URL = 'http://localhost:8080/api/theater-mgnt'
@@ -218,14 +219,14 @@ export function mapScreeningToShowtime(screening: any) {
     time: timeStr,
     date: dateStr,
     startDateTime: screening.startTime,
-    format: screening.format || undefined,
-    price: screening.price ? Number(screening.price) : undefined,
-    availableSeats: screening.availableSeats !== undefined ? Number(screening.availableSeats) : undefined,
-    roomId: screening.roomId,
-    cinemaId: screening.cinemaId,
-    roomName: screening.roomName,
-    cinemaName: screening.cinemaName,
-    status: screening.status
+    format: screening.format ?? '2D',
+    price: screening.price ? Number(screening.price) : 0,
+    availableSeats: screening.availableSeats !== undefined ? Number(screening.availableSeats) : 0,
+    roomId: screening.roomId ?? undefined,
+    cinemaId: screening.cinemaId ?? undefined,
+    roomName: screening.roomName ?? undefined,
+    cinemaName: screening.cinemaName ?? undefined,
+    status: screening.status ?? undefined
   }
 }
 
@@ -236,7 +237,7 @@ export async function getScreeningSeatsByScreeningId(screeningId: string) {
   return response.data
 }
 
-export function mapScreeningSeatToSeat(seat: any, index: number) {
+export function mapScreeningSeatToSeat(seat: any, index: number): Seat | null {
   if (!seat) return null
 
   // Prefer new seatNumber field (row + number, e.g., "A1" or "A-1"), fallback to seatId
@@ -284,9 +285,9 @@ export function mapScreeningSeatToSeat(seat: any, index: number) {
   }
 
   // Get price from response (convert from BigDecimal if needed)
-  const price = seat.price ? Number(seat.price) : undefined
+  const price = seat.price ? Number(seat.price) : 0
 
-  return {
+  const result: Seat = {
     id: seat.id || seat.seatNumber || seat.seatId || `${row}-${seatNumber}`,
     row,
     number: seatNumber,
@@ -294,13 +295,16 @@ export function mapScreeningSeatToSeat(seat: any, index: number) {
     isSelected: false,
     type,
     price,
-    // Transfer information
-    isForTransfer: seat.isForTransfer || false,
-    transferTicketId: seat.transferTicketId,
-    sellerName: seat.sellerName,
-    sellerEmail: seat.sellerEmail,
-    sellerPhone: seat.sellerPhone,
   }
+
+  // Add optional transfer information only if they exist
+  if (seat.isForTransfer !== undefined) result.isForTransfer = Boolean(seat.isForTransfer)
+  if (seat.transferTicketId) result.transferTicketId = String(seat.transferTicketId)
+  if (seat.sellerName) result.sellerName = String(seat.sellerName)
+  if (seat.sellerEmail) result.sellerEmail = String(seat.sellerEmail)
+  if (seat.sellerPhone) result.sellerPhone = String(seat.sellerPhone)
+
+  return result
 }
 
 // ==================== COMBO APIs ====================
@@ -356,17 +360,17 @@ export async function cancelBooking(bookingId: string) {
 
 // ==================== MAPPER ====================
 
-export function mapComboForDisplay(combo: any) {
+export function mapComboForDisplay(combo: any): ComboItem | null {
   if (!combo) return null
 
   return {
-    id: combo.id,
-    name: combo.name,
+    id: combo.id || '',
+    name: combo.name || '',
     description: combo.description || '',
     imageUrl: combo.imageUrl || '',
     price: Number(combo.price) || 0,
-    // Use a popcorn emoji as a lightweight default icon since backend does not provide one
     icon: '🍿',
+    deleted: combo.deleted ?? false,
   }
 }
 
