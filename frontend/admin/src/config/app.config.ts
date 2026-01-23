@@ -5,7 +5,7 @@
 
 export const APP_CONFIG = {
   // Base path for the application (e.g., '/admin', '/', etc.)
-  BASE_PATH: import.meta.env.VITE_BASE_PATH || '/admin',
+  BASE_PATH: import.meta.env.VITE_BASE_PATH || '/',
   
   // API configuration
   API_URL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
