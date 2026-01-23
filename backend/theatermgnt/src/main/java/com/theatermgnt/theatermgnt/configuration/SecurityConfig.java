@@ -16,10 +16,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+    private static final String CONTEXT_PATH = "/api/theater-mgnt";
     private final String[] PUBLIC_ENDPOINTS = {
         "/register",
         "/users",
@@ -39,6 +42,9 @@ public class SecurityConfig {
         "/reviews/**",
         "/cinemas/**"
     };
+    private final String[] PUBLIC_ENDPOINTS_WITH_CONTEXT = Arrays.stream(PUBLIC_ENDPOINTS)
+            .map(path -> CONTEXT_PATH + path)
+            .toArray(String[]::new);
 
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
@@ -48,6 +54,8 @@ public class SecurityConfig {
         httpSecurity.authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.OPTIONS, "/**")
                 .permitAll()
                 .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS)
+                .permitAll()
+                .requestMatchers(HttpMethod.POST, PUBLIC_ENDPOINTS_WITH_CONTEXT)
                 .permitAll()
                 .requestMatchers(
                         HttpMethod.GET,
