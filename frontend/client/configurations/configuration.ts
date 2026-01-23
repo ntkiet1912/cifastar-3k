@@ -17,7 +17,7 @@ export const API = {
 
 export const OAuthConfig = {
   clientId: "389202643503-grb2t3an3e95vn6fl1bp1m1039u3srij.apps.googleusercontent.com",
-  redirectUri: `${process.env.NEXT_PUBLIC_APP_URL}/authenticate`,
+  redirectUri: `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/authenticate`,
   authUri: "https://accounts.google.com/o/oauth2/auth",
 };
 
