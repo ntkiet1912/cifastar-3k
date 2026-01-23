@@ -1,5 +1,9 @@
 {
   "rewrites": [
+    {
+      "source": "/api/theater-mgnt/(.*)",
+      "destination": "http://18.183.39.22:8080/api/theater-mgnt/$1"
+    },
     { "source": "/admin/assets/(.*)", "destination": "/assets/$1" },
     { "source": "/admin/logo.png", "destination": "/logo.png" },
     { "source": "/admin", "destination": "/index.html" },
