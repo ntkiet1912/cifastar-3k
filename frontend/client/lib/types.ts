@@ -22,6 +22,10 @@ export interface Showtime {
   availableSeats: number
   roomId?: string
   cinemaId?: string
+  startDateTime?: string
+  roomName?: string
+  cinemaName?: string
+  status?: string
 }
 
 export interface Seat {

@@ -107,7 +107,9 @@ export default function MovieDetailPage({
             : availableDates[0];
 
           // Always set to today or first available future date
-          setSelectedDate(defaultDate);
+          if (defaultDate) {
+            setSelectedDate(defaultDate);
+          }
           setSelectedCinema("all"); // "all" = All Cinemas
         }
       } catch (error) {
@@ -126,7 +128,7 @@ export default function MovieDetailPage({
     const cinemaMap = new Map(cinemas.map((c) => [c.id, c]));
     const ids = Array.from(
       new Set(allShowtimes.map((st) => st.cinemaId).filter(Boolean)),
-    );
+    ) as string[];
     return ids
       .map((cid) => cinemaMap.get(cid))
       .filter(Boolean) as typeof cinemas;
@@ -534,11 +536,13 @@ export default function MovieDetailPage({
                   <div className="text-sm text-slate-600 dark:text-slate-400 space-y-1 mb-4 text-left">
                     <p className="flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
-                      Room name: {showtime.roomName ? `${showtime.roomName}` : "N/A"}
+                      Room name:{" "}
+                      {showtime.roomName ? `${showtime.roomName}` : "N/A"}
                     </p>
                     <p className="flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
-                      Cinema name: {showtime.cinemaName ? `${showtime.cinemaName}` : "N/A"}
+                      Cinema name:{" "}
+                      {showtime.cinemaName ? `${showtime.cinemaName}` : "N/A"}
                     </p>
                   </div>
                   {showtime.price !== undefined && (
