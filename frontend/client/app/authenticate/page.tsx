@@ -22,10 +22,10 @@ export default function Authenticate() {
       const authCode = isMatch[1];
 
       fetch(
-        `http://localhost:8080/api/theater-mgnt/auth/outbound/authenticate?code=${authCode}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/outbound/authenticate?code=${authCode}`,
         {
           method: "POST",
-        }
+        },
       )
         .then((response) => {
           return response.json();
@@ -61,7 +61,7 @@ export default function Authenticate() {
 
   const handleCreatePassword = async (
     password: string,
-    confirmPassword: string
+    confirmPassword: string,
   ) => {
     try {
       await createPassword(password, confirmPassword);

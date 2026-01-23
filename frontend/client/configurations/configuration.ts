@@ -1,5 +1,5 @@
 export const CONFIG = {
-  API: "http://localhost:8080/api/theater-mgnt",
+  API: process.env.NEXT_PUBLIC_API_URL as string,
 };
 
 export const API = {
