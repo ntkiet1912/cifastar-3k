@@ -1,6 +1,6 @@
 export const CONFIG = {
   // API: "http://localhost:8080/api/theater-mgnt",
-  API: "http://18.183.39.22:8080/api/theater-mgnt",
+  API: `${import.meta.env.VITE_BASE_PATH}/api/theater-mgnt`,
 }
 export const API = {
   LOGIN: "/auth/admin/login",
