@@ -3,6 +3,7 @@ import { API, CONFIG } from "./configuration";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useNotificationStore } from "@/stores/useNotificationStore";
 import { ROUTES } from "@/routes/routes";
+import { getToken } from "@/services/localStorageService";
 
 const httpClient = axios.create({
   baseURL: CONFIG.API,
@@ -15,7 +16,7 @@ const httpClient = axios.create({
 // Request interceptor - add auth token
 httpClient.interceptors.request.use(
   (config) => {
-    const token = useAuthStore.getState().token;
+    const token = useAuthStore.getState().token || getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
