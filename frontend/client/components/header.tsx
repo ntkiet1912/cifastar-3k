@@ -9,6 +9,14 @@ import { clearAuthData } from "@/services/localStorageService";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore, useAuthModalStore } from "@/store";
 
+function LogoIcon() {
+  return (
+    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-500 flex items-center justify-center">
+      <span className="text-white font-bold text-lg">C</span>
+    </div>
+  );
+}
+
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
@@ -114,9 +122,7 @@ export function Header() {
         <div className="container-max flex items-center justify-between h-20 px-4 md:px-8">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">C</span>
-            </div>
+            <LogoIcon />
             <span className="gradient-text font-bold text-2xl hidden sm:inline">
               Cifastar
             </span>
