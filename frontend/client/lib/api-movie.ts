@@ -5,7 +5,7 @@ import { useAuthStore } from '@/store'
 import type { Seat, ComboItem } from './types'
 
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/theater-mgnt"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL as string
 
 
 const api = axios.create({
