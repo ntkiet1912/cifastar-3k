@@ -13,7 +13,8 @@ export function useSocket(url?: string) {
   const token = useAuthStore(selectToken);
   const isConnectedRef = useRef(false);
 
-  const socketUrl = url || import.meta.env.VITE_SOCKET_URL || 'http://localhost:9092';
+  const socketUrl = url || import.meta.env.VITE_SOCKET_URL || 
+    (import.meta.env.PROD ? window.location.origin : 'http://localhost:9092');
 
   useEffect(() => {
     // Connect to Socket.IO if we have a token and not already connected

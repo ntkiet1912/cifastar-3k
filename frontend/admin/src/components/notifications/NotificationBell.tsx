@@ -32,7 +32,10 @@ export function NotificationBell() {
     // Connect to Socket.IO with JWT token authentication
     if (token && currentUserId) {
       const socketUrl =
-        import.meta.env.VITE_SOCKET_URL || "http://localhost:9092";
+        import.meta.env.VITE_SOCKET_URL ||
+        (import.meta.env.PROD
+          ? window.location.origin
+          : "http://localhost:9092");
 
       console.log("Connecting to Socket.IO server:", socketUrl);
       console.log("Current user accountId:", currentUserId);
