@@ -83,11 +83,14 @@ public class SecurityConfig {
     @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("http://localhost:5173");
-        corsConfiguration.addAllowedOrigin("http://localhost:3000");
-        corsConfiguration.addAllowedOrigin("https://cifastar-3k-admin.vercel.app");
-        corsConfiguration.addAllowedOriginPattern("https://*.ngrok-free.app");
-        corsConfiguration.addAllowedOriginPattern("https://*.ngrok-free.dev");
+        corsConfiguration.setAllowedOriginPatterns(Arrays.asList(
+                "http://localhost:5173",
+                "http://localhost:3000",
+                "https://cifastar-3k-admin.vercel.app",
+                "https://*.vercel.app",
+                "https://*.ngrok-free.app",
+                "https://*.ngrok-free.dev"
+        ));
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.setAllowCredentials(true);
