@@ -295,6 +295,9 @@ export const generateSeats = (): Seat[] => {
         row,
         number: i,
         isAvailable: Math.random() > 0.2,
+        isSelected: false,
+        type: "standard",
+        price: 0,
       })
     }
   })

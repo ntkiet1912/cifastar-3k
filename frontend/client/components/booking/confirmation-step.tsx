@@ -131,17 +131,6 @@ export default function ConfirmationStep({
                 {bookingSummary.movie.ageRating.code}
               </p>
             </div>
-            {bookingSummary.movie.genres &&
-              bookingSummary.movie.genres.length > 0 && (
-                <div>
-                  <p className="text-sm text-muted-foreground">Genres</p>
-                  <p className="font-semibold">
-                    {Array.from(bookingSummary.movie.genres)
-                      .map((g: any) => g.name)
-                      .join(", ")}
-                  </p>
-                </div>
-              )}
           </div>
         </div>
       )}
