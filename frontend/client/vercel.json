@@ -5,6 +5,21 @@
     {
       "source": "/api-backend/:path*",
       "destination": "http://18.183.39.22:8080/api/theater-mgnt/:path*"
+    },
+    {
+      "source": "/api/movies/:path*",
+      "destination": "http://18.183.39.22:8080/api/movies/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api-backend/:path*",
+      "headers": [
+        {
+          "key": "X-Forwarded-Proto",
+          "value": "https"
+        }
+      ]
     }
   ]
 }
